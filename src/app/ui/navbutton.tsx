@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 
-export default function MenuButton({ initialMenuItems }) {
+export default function MenuButton({ initialMenuItems }: { initialMenuItems: any }) {
     const router = useRouter();
     const pathname = usePathname();
 
