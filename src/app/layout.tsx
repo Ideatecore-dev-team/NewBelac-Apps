@@ -27,8 +27,10 @@ export default function RootLayout(props: { children: ReactNode }) {
       <body className={inter.className}>
         <Providers initialState={initialState}>
           <Navbar />
-          <div className='flex mx-auto w-full h-lvh'>
-            {props.children}
+          <div id='main-container' className='flex center w-full h-lvh'>
+            <div id='main-wrapper' className='mx-auto'>
+              {props.children}
+            </div>
           </div>
         </Providers>
       </body>
