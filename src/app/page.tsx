@@ -9,7 +9,7 @@ function App() {
 
   return (
     <>
-      <div>
+      {/* <div>
         <h2>Account</h2>
 
         <div>
@@ -40,7 +40,7 @@ function App() {
         ))}
         <div>{status}</div>
         <div>{error?.message}</div>
-      </div>
+      </div> */}
     </>
   )
 }
