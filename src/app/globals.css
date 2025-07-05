@@ -3,4 +3,15 @@
 :root {
   background-color: #151516;
   color: #ffffff;
+  font-family: "D-DIN-PRO";
+}
+
+@font-face {
+  font-family: "D-DIN-PRO";
+  src: url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.eot");
+  src: url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.svg#D-DIN-PRO")format("svg");
 }
