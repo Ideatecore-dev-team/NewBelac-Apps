@@ -1,7 +1,16 @@
+'use client'
+
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
+
 import Link from "next/link"
-import NormalButtonComponents from "./normalButtonComponents"
+import NormalButtonComponents from "./navbarcomponents/normalButtonComponents"
+import MenusNavbarComponents from './navbarcomponents/menusNavbarComponents'
 
 export default function Navbar() {
+    const { address, status } = useAccount()
+    const { connectors, connect } = useConnect()
+    const { disconnect } = useDisconnect()
+
     return (
         <>
             <nav data-state="Default" className="navbarComponent flex py-[12px] px-[48px] flex-col items-center gap-[10px] self-stretch border border-[#2C2C2C] bg-[#1B1B1B]/60 backdrop-blur-[5px]">
@@ -16,7 +25,8 @@ export default function Navbar() {
                             </h1>
                         </div>
                     </div>
-                    <NormalButtonComponents />
+                {status === 'connected' && <MenusNavbarComponents />}
+                {status !== 'connected' && <NormalButtonComponents />}
                 </div>
             </nav>
         </>

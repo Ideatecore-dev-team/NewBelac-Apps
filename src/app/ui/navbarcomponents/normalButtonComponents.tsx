@@ -2,7 +2,7 @@
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
-export default function MetaMaskButton() {
+export default function NormalButtonComponents() {
     const { address, status } = useAccount()
     const { connectors, connect } = useConnect()
     const { disconnect } = useDisconnect()
