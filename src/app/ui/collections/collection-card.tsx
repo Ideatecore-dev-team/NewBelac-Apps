@@ -4,19 +4,14 @@ export default function CollectionCard({ data }: { data: any }) {
     return (
         <div id="collection-card-container" className="w-full bg-Color-Grey-2 rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex flex-col justify-start items-start">
             <div id="collection-card-wrapper-top" className="self-stretch h-48 relative bg-gradient-to-b from-white/0 to-black/20 rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] overflow-hidden">
-                <div className="w-full h-24 px-16 py-6 left-0 top-[192px] absolute bg-gradient-to-l from-black/70 to-black/0 inline-flex flex-col justify-end items-center gap-2.5 overflow-hidden">
-                    <div className="self-stretch inline-flex justify-start items-center gap-2">
-                        <div className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">View Collection</div>
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <Image
-                                priority
-                                height={20}
-                                width={20}
-                                src="/icons/pencil-outline.svg"
-                                alt="copy-button"
-                            />
-                        </div>
-                    </div>
+                <div className="absolute right-2 top-2 hover:bg-[#2C2C2C] disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 transition-colors p-3 bg-transparent rounded-md outline outline-1 outline-offset-[-1px] outline-[#2C2C2C]">
+                    <Image
+                        priority
+                        height={20}
+                        width={20}
+                        src="/icons/pencil-outline.svg"
+                        alt="edit-collection"
+                    />
                 </div>
             </div>
             <div id="collection-card-wrapper-bottom" className="self-stretch bg-[#1C1C1C] px-4 py-4 inline-flex justify-between items-center overflow-hidden">

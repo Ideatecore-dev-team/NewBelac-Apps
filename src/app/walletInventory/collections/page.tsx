@@ -13,7 +13,7 @@ export default function Collections() {
     return (
         <div id="collection-page-container">
             <div id="collection-card-wrapper" className="grid grid-cols-4 w-full gap-8">
-                {collectionsData.map((collection) => (
+                {collectionsData.map((collection, key) => (
                     <CollectionCard data={collection} />
                 ))}
             </div>
