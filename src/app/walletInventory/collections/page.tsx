@@ -12,6 +12,7 @@ export default function Collections() {
 
     return (
         <div id="collection-page-container">
+            <div id="collection-page-subtitle" className="text-Color-White-2/70 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Created collections ({collectionsData.length})</div>
             <div id="collection-card-wrapper" className="grid grid-cols-4 w-full gap-8">
                 {collectionsData.map((collection, key) => (
                     <CollectionCard data={collection} />
