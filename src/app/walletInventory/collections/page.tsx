@@ -8,6 +8,7 @@ export default function Collections() {
         { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
         { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
         { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
+        
     ];
 
     return (
