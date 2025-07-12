@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type ReactNode, useState } from 'react'
 import { type State, WagmiProvider } from 'wagmi'
 
+import { AuthProvider } from '../app/contexts/AuthContext';
+
 import { getConfig } from '@/wagmi'
 
 export function Providers(props: {
@@ -16,7 +18,9 @@ export function Providers(props: {
   return (
     <WagmiProvider config={config} initialState={props.initialState}>
       <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         {props.children}
+        </AuthProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )

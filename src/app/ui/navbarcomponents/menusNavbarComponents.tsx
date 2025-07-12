@@ -1,21 +1,18 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { useAccount, useBalance } from "wagmi";
-import { useDisconnect } from 'wagmi';
-import { useRouter } from 'next/navigation';
+"use client"; 
+
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import EditProfileModalComponents from "./EditProfileModalComponents";
+import EditProfileModalComponents from './EditProfileModalComponents';
+import DropdownNavbarComponents from './dropdownNavbarComponents';
+import { useAuth } from '@/app/contexts/AuthContext'; 
 
 export default function MenusNavbarComponents() {
-    const { address } = useAccount();
-    const { data: balanceData, isLoading } = useBalance({
-        address: address,
-    });
+
+    // context dari AuthContext
+    const { address, balanceData, isLoading, disconnect } = useAuth();
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-
-    const { disconnect } = useDisconnect();
-    const router = useRouter();
     const dropdownRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -28,27 +25,35 @@ export default function MenusNavbarComponents() {
             }
         }
         if (isDropdownOpen) {
-            document.addEventListener("mousedown", handleClickOutside as EventListener);
+            document.addEventListener('mousedown', handleClickOutside as EventListener);
         }
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside as EventListener);
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside as EventListener
+            );
         };
     }, [isDropdownOpen]);
 
     const handleOpenEditProfile = () => {
         setIsEditProfileModalOpen(true);
-        setIsDropdownOpen(false); // Langsung tutup dropdown saat modal dibuka
+        setIsDropdownOpen(false);
     };
-    
 
     const handleCloseEditProfile = () => {
         setIsEditProfileModalOpen(false);
     };
 
-    return (
-        <> 
-            {isEditProfileModalOpen && <EditProfileModalComponents onClose={handleCloseEditProfile} />}
+    const handleLogoutClick = () => {
+        disconnect(); //dari context
+        setIsDropdownOpen(false);
+    };
 
+    return (
+        <>
+            {isEditProfileModalOpen && (
+                <EditProfileModalComponents onClose={handleCloseEditProfile} />
+            )}
             <div className="menus flex items-center gap-[24px]">
                 <div className="normalButtonComponent flex size-[48px] py-[12px] px-[16px] justify-center gap-[16px] rounded-[6px] border border-[#2C2C2C] bg-[#1C1C1C] hover:bg-[#2C2C2C] disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 transition-colors">
                     <div className="text-[#fff]">
@@ -62,12 +67,24 @@ export default function MenusNavbarComponents() {
                     <p className="text-white text-[16px] font-semibold leading-4 tracking-[0.5px] font-['D-DIN-PRO']">
                         {isLoading && <span>...</span>}
                         {balanceData && (
-                            <span>{parseFloat(balanceData.formatted).toFixed(1)}</span>
+                            <span>{parseFloat(balanceData.formatted).toFixed(4)}</span>
                         )}
                     </p>
-                    <Image priority height={16} width={16} src="/icons/IDRX.svg" alt="IDRX" />
+                    <Image
+                        priority
+                        height={16}
+                        width={16}
+                        src="/icons/IDRX.svg"
+                        alt="IDRX"
+                    />
                 </div>
-                <Image priority height={32} width={2} src="/icons/vector-201.svg" alt="IDRX" />
+                <Image
+                    priority
+                    height={32}
+                    width={2}
+                    src="/icons/vector-201.svg"
+                    alt="vector 201"
+                />
                 <p className="text-white text-[16px] font-semibold leading-4 tracking-[0.5px] font-['D-DIN-PRO'] opacity-70">
                     {isLoading && <span>...</span>}
                     {address && (
@@ -84,35 +101,11 @@ export default function MenusNavbarComponents() {
                     >
                         <div className="flex size-[48px] justify-center items-center shrink-0 rounded-[92px] border border-[#2C2C2C] bg-[#fff]"></div>
                     </div>
-                    <div
-                        className={`absolute right-0 mt-2 transition-all duration-300 ease-in-out ${isDropdownOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}
-                    >
-                        <div className="dropdownNavbarComponents absolute flex flex-col right-0 mt-[12px] w-[190px] p-[6px] gap-[4px] bg-[#1C1C1C] border border-[#2C2C2C] rounded-[6px] shadow-lg z-20">
-                            
-                            <div
-                                onClick={handleOpenEditProfile}
-                                className='flex h-[40px] py-[8px] px-[16px] items-center gap-[16px] self-stretch w-full rounded-[4px] hover:bg-[#2C2C2C] transition-colors cursor-pointer'
-                            >
-                                <Image priority height={20} width={20} src="/icons/edit-profile.svg" alt="Edit Profile" />
-                                <div className='text-container flex justify-start items-center w-[70px]'>
-                                    <p className="text-white text-[12px] font-semibold leading-4 tracking-[0.5px] font-['D-DIN-PRO']">Edit Profile</p>
-                                </div>
-                            </div>
-                            
-                            <div onClick={() => router.push('/walletInventory/collections')} className='flex h-[40px] py-[8px] px-[16px] items-center gap-[16px] self-stretch w-full rounded-[4px] hover:bg-[#2C1C1C] transition-colors cursor-pointer'>
-                                <Image priority height={20} width={20} src="/icons/inventory.svg" alt="Inventory" />
-                                <div className='text-container flex justify-start items-center w-[70px]'>
-                                    <p className="text-white text-[12px] font-semibold leading-4 tracking-[0.5px] font-['D-DIN-PRO']">Inventory</p>
-                                </div>
-                            </div>
-                            <div onClick={() => { disconnect(); setIsDropdownOpen(false); }} className='flex h-[40px] py-[8px] px-[16px] items-center gap-[16px] self-stretch w-full rounded-[4px] hover:bg-[#2C1C1C] transition-colors cursor-pointer'>
-                                <Image priority height={20} width={20} src="/icons/logout.svg" alt="Logout" />
-                                <div className='text-container flex justify-start items-start w-[70px]'>
-                                    <p className="text-white text-[12px] font-semibold leading-4 tracking-[0.5px] font-['D-DIN-PRO']">Logout</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <DropdownNavbarComponents
+                        isOpen={isDropdownOpen}
+                        onEditProfile={handleOpenEditProfile}
+                        onLogout={handleLogoutClick}
+                    />
                 </div>
             </div>
         </>
