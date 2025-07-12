@@ -1,32 +1,59 @@
+// app/contexts/AuthContext.tsx
 "use client";
 
 import { createContext, useContext, useMemo, ReactNode, FC } from "react";
-import { useAccount, useBalance, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useBalance, useConnect, useDisconnect, useSwitchChain } from "wagmi";
+
+const LSK_TOKEN_ADDRESS = '0x8a21CF9Ba08Ae709D64Cb25AfAA951183EC9FF6D';
 
 function useAuthValue() {
-    const { address, status } = useAccount();
-    const { data: balanceData, isLoading } = useBalance({ address });
+    const { address, status, chainId } = useAccount();
     const { disconnect } = useDisconnect();
     const { connectors, connect } = useConnect();
+    const { switchChain } = useSwitchChain(); 
 
+    const {
+        data: nativeBalanceData,
+        isLoading: isNativeLoading
+    } = useBalance({ address });
+
+    const {
+        data: lskBalanceData,
+        isLoading: isLskLoading
+    } = useBalance({
+        address,
+        token: LSK_TOKEN_ADDRESS,
+    });
+
+    const isLoading = isNativeLoading || isLskLoading;
 
     return useMemo(() => ({
         address,
         status,
-        balanceData,
+        nativeBalanceData, // ETH
+        lskBalanceData,    // LSK
         isLoading,
         disconnect,
         connectors,
         connect,
-    }), [address, status, balanceData, isLoading, disconnect, connectors, connect]);
+        chainId,
+        switchChain,
+    }), [
+        address,
+        status,
+        nativeBalanceData,
+        lskBalanceData,
+        isLoading,
+        disconnect,
+        connectors,
+        connect,
+        chainId,
+        switchChain,
+    ]);
 }
-
 type AuthContextType = ReturnType<typeof useAuthValue>;
 
-//defaulnya kubuat null
 const AuthContext = createContext<AuthContextType | null>(null);
-
-
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const value = useAuthValue();
