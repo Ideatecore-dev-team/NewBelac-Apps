@@ -2,12 +2,12 @@ import React from 'react';
 import Image from 'next/image';
 import BaseButton, { BaseButtonProps } from './baseButton';
 
-interface ModalProps extends BaseButtonProps {
+interface IconTextButtonProps extends BaseButtonProps {
     label: string,
     icon: string
 }
 
-const IconTextButton: React.FC<ModalProps> = ({
+const IconTextButton: React.FC<IconTextButtonProps> = ({
     label,
     icon,
     onClick,
