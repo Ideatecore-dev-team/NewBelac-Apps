@@ -1,11 +1,11 @@
 import React from 'react';
 import BaseButton, { BaseButtonProps } from './baseButton';
 
-interface TextButton extends BaseButtonProps {
+interface TextButtonProps extends BaseButtonProps {
     label: string
 }
 
-const TextButton: React.FC<TextButton> = ({
+const TextButton: React.FC<TextButtonProps> = ({
     label,
     onClick,
     withoutOutline,
