@@ -45,7 +45,7 @@ const BaseButton: React.FC<BaseButtonProps> = ({
                 flex
                 justify-start
                 items-center
-                gap-4
+                cursor-pointer
             `} onClick={onClick}>
                 <div className="flex justify-center items-center gap-2.5">
                     {children}

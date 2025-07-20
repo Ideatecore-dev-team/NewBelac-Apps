@@ -85,7 +85,7 @@ const MiniModal: React.FC<ModalProps> = ({
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                        className="text-gray-400 cursor-pointer hover:text-gray-600 focus:outline-none"
                         aria-label="Close modal"
                     >
                         <svg
