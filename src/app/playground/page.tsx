@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Modal from '../ui/modal/miniModal';
 import { TextButton, IconButton, IconTextButton } from '../ui/button';
-import { BaseTextbox, LegendTextbox } from '../ui/textbox';
+import { BaseTextbox, LegendTextbox, BaseSelect } from '../ui/inputbox';
 
 export default function Playground() {
 
@@ -57,6 +57,29 @@ export default function Playground() {
             setErrorMessage('');
         }
     };
+
+    // Select
+    const [selectedCity, setSelectedCity] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState('');
+    const [productStatus, setProductStatus] = useState('');
+
+    const cityOptions = [
+        { value: 'jakarta', label: 'Jakarta' },
+        { value: 'bandung', label: 'Bandung' },
+        { value: 'surabaya', label: 'Surabaya' },
+    ];
+
+    const countryOptions = [
+        { value: 'id', label: 'Indonesia' },
+        { value: 'sg', label: 'Singapura' },
+        { value: 'my', label: 'Malaysia' },
+    ];
+
+    const statusOptions = [
+        { value: 'active', label: 'Aktif' },
+        { value: 'inactive', label: 'Tidak Aktif' },
+        { value: 'pending', label: 'Menunggu' },
+    ];
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 space-y-5">
@@ -142,6 +165,66 @@ export default function Playground() {
                             color="Netral"
                         />
                     </div>
+                </div>
+            </div>
+
+
+            <div id="textbox-wrapper" className='w-full space-y-3'>
+                <h1 className="text-2xl font-bold">Select</h1>
+
+                {/* Contoh BaseSelect - Ukuran M, Netral */}
+                <div className="w-full max-w-md">
+                    <label htmlFor="city-select" className="block text-white text-base font-semibold mb-2">Pilih Kota:</label>
+                    <BaseSelect
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        options={cityOptions}
+                        placeholder="Pilih kota Anda"
+                        size="M"
+                        color="Netral"
+                    />
+                </div>
+
+                {/* Contoh BaseSelect - Ukuran L, Alert (jika belum dipilih) */}
+                <div className="w-full max-w-md">
+                    <label htmlFor="country-select" className="block text-white text-base font-semibold mb-2">Pilih Negara:</label>
+                    <BaseSelect
+                        value={selectedCountry}
+                        onChange={(e) => setSelectedCountry(e.target.value)}
+                        options={countryOptions}
+                        placeholder="Pilih negara Anda"
+                        size="L"
+                        color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
+                    />
+                    {!selectedCountry && (
+                        <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
+                    )}
+                </div>
+
+                {/* Contoh BaseSelect - Ukuran S, Disabled */}
+                <div className="w-full max-w-md">
+                    <label htmlFor="status-select" className="block text-white text-base font-semibold mb-2">Status Produk:</label>
+                    <BaseSelect
+                        value={productStatus}
+                        onChange={(e) => setProductStatus(e.target.value)}
+                        options={statusOptions}
+                        placeholder="Pilih status"
+                        size="S"
+                        color="Netral"
+                        disabled={true} // Contoh: Select dinonaktifkan
+                    />
+                </div>
+
+                {/* Contoh BaseSelect - Ukuran XS */}
+                <div className="w-full max-w-md">
+                    <label htmlFor="small-select" className="block text-white text-base font-semibold mb-2">Opsi Kecil:</label>
+                    <BaseSelect
+                        value="option1" // Contoh nilai default
+                        onChange={() => { }}
+                        options={[{ value: 'option1', label: 'Opsi Satu' }, { value: 'option2', label: 'Opsi Dua' }]}
+                        size="XS"
+                        color="Netral"
+                    />
                 </div>
             </div>
 

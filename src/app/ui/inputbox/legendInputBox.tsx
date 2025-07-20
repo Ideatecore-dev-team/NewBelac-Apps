@@ -1,5 +1,5 @@
 import React from "react";
-import BaseTextbox, { BaseTextboxProps } from "./baseTextBox";
+import BaseTextbox, { BaseTextboxProps } from "./baseTextbox";
 
 type LegendPosition = "top" | "left";
 
