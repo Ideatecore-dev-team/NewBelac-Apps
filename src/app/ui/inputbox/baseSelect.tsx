@@ -25,6 +25,8 @@ export interface BaseSelectProps {
     size?: SizeVariant;
     color?: ColorVariant;
     withoutOutline?: boolean;
+    required?: boolean;
+    requiredMsg?: string;
 }
 
 const BaseSelect: React.FC<BaseSelectProps> = ({
@@ -36,6 +38,8 @@ const BaseSelect: React.FC<BaseSelectProps> = ({
     size = "M",
     color = "Netral",
     withoutOutline = false,
+    required = false,
+    requiredMsg = "You must select any option"
 }) => {
     const textColorClasses =
         color === "Alert"
@@ -111,6 +115,9 @@ const BaseSelect: React.FC<BaseSelectProps> = ({
                     />
                 </svg>
             </div>
+            {!value && required && (
+                <p className="text-red-400 text-sm mt-1">{requiredMsg}</p>
+            )}
         </div>
     );
 };

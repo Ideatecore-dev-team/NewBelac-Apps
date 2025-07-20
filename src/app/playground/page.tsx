@@ -87,7 +87,7 @@ export default function Playground() {
             <div id="textbox-wrapper" className='w-full space-y-3'>
                 <h1 className="text-2xl font-bold">Text Box</h1>
 
-                <div className="space-x-5">
+                <div className="flex items-center space-x-5">
                     <BaseTextbox
                         value={name}
                         onChangeInput={handleNameChange}
@@ -102,8 +102,9 @@ export default function Playground() {
                         size="M"
                         color={errorMessage ? "Alert" : "Netral"} // Warna "Alert" jika ada error
                         type="email"
+                        required={errorMessage == "Alert"}
+                        requiredMsg={errorMessage}
                     />
-                    {errorMessage && <p className="text-red-400 text-sm">{errorMessage}</p>}
 
 
                     <BaseTextbox
@@ -146,10 +147,9 @@ export default function Playground() {
                             legendPosition="top"
                             size="M"
                             type="email"
+                            required={errorMessage == "Alert"}
+                            requiredMsg={errorMessage}
                         />
-                        {!email.includes('@') && email && (
-                            <p className="text-red-400 text-sm mt-1">Format email tidak valid.</p>
-                        )}
                     </div>
 
                     {/* Contoh LegendInputBox - Posisi Left */}
@@ -189,6 +189,9 @@ export default function Playground() {
                             placeholder="Pilih negara Anda"
                             size="L"
                             color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
+
+                            required={errorMessage === "Alert"}
+                            requiredMsg={errorMessage}
                         />
                         {!selectedCountry && (
                             <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
@@ -236,15 +239,13 @@ export default function Playground() {
                         size="L"
                         color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
 
-
                         // tambah ini bedanya
                         legendText="Legend Kiri: "
                         typeBox='select'
                         legendPosition='left'
+                        required={true}
+                        requiredMsg="Harap pilih negara."
                     />
-                    {!selectedCountry && (
-                        <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
-                    )}
                 </div>
             </div>
 

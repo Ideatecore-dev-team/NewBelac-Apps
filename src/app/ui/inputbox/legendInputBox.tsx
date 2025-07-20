@@ -25,7 +25,9 @@ const TailwindTextbox: React.FC<LegendTextboxProps> = ({
     legendText,
     legendPosition = "top",
     typeBox = "input",
-    options = []
+    options = [],
+    required = false,
+    requiredMsg
 }) => {
     return (
         <div className={`w-full ${legendPosition === "top" ? 'flex flex-col space-y-2' : 'flex items-center space-x-4'}`}>
@@ -46,6 +48,8 @@ const TailwindTextbox: React.FC<LegendTextboxProps> = ({
                         size={size}
                         color={color}
                         withoutOutline={withoutOutline}
+                        required={required}
+                        requiredMsg={requiredMsg}
                     />
                 )
             }
@@ -55,9 +59,11 @@ const TailwindTextbox: React.FC<LegendTextboxProps> = ({
                         value={value}
                         onChangeSelect={onChangeSelect}
                         options={options}
-                        placeholder="Pilih kota Anda"
-                        size="M"
-                        color="Netral"
+                        placeholder={placeholder}
+                        size={size}
+                        color={color}
+                        required={required}
+                        requiredMsg={requiredMsg}
                     />
                 )
             }
