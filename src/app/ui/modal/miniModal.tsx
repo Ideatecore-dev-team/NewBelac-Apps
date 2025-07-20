@@ -1,4 +1,4 @@
-// components/Modal.tsx
+'use client'
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { IconTextButton, TextButton } from '../button';
@@ -32,6 +32,14 @@ const MiniModal: React.FC<ModalProps> = ({
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        // Efek ini HANYA untuk mengatur fokus saat modal pertama kali terbuka
+        if (isOpen) {
+            modalRef.current?.focus();
+        }
+    }, [isOpen]); // <-- KUNCI: Dependensi hanya pada `isOpen`
+
+    useEffect(() => {
+        // Efek ini untuk side-effect lain seperti listener keyboard
         setMounted(true);
 
         const handleEscape = (event: KeyboardEvent) => {
@@ -42,15 +50,15 @@ const MiniModal: React.FC<ModalProps> = ({
 
         if (isOpen) {
             document.addEventListener('keydown', handleEscape);
-            // Fokus pada modal ketika terbuka untuk aksesibilitas
-            modalRef.current?.focus();
         }
 
+        // Fungsi cleanup akan dijalankan saat komponen unmount atau sebelum efek berjalan lagi
         return () => {
             document.removeEventListener('keydown', handleEscape);
-            setMounted(false);
+            // Tidak perlu setMounted(false) di sini karena akan menyebabkan re-render yang tidak perlu
+            // dan bisa menyebabkan masalah saat unmounting.
         };
-    }, [isOpen, onClose]);
+    }, [isOpen, onClose]); // Dependensi ini sudah benar untuk listener
 
     if (!mounted || !isOpen) {
         return null;
@@ -59,7 +67,7 @@ const MiniModal: React.FC<ModalProps> = ({
     return createPortal(
 
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none"
+            className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto"
             aria-labelledby="modal-title"
             role="dialog"
             aria-modal="true"
