@@ -19,7 +19,7 @@ export interface SelectOption {
 export interface BaseSelectProps {
     options?: SelectOption[];
     value: string | number;
-    onChangeSelect?: (event: React.ChangeEvent<| HTMLSelectElement>) => void;
+    onChangeSelect?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     placeholder?: string;
     disabled?: boolean;
     size?: SizeVariant;

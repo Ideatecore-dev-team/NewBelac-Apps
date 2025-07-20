@@ -26,7 +26,7 @@ export interface BaseTextboxProps {
 
 const BaseTextbox: React.FC<BaseTextboxProps> = ({
     value,
-    onChangeInput = () => ({}),
+    onChangeInput,
     placeholder,
     readOnly = false,
     disabled = false,
