@@ -71,6 +71,7 @@ const BaseTextbox: React.FC<BaseTextboxProps> = ({
                 transition-all
                 duration-200
                 ease-in-out
+                w-full
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
                 ${!withoutOutline ? 'focus:ring-1' : ''} 
             `}
