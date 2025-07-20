@@ -3,12 +3,12 @@ import CollectionCard from "@/app/ui/collections/collection-card";
 
 export default function Collections() {
     const collectionsData = [
-        { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
-        { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
-        { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
-        { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
-        { label: 'Nike Realmark', price: 10.1, items: 68, image: "/nike.png" },
-        
+        { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "https://placehold.co/300x200.png" },
+        { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "https://placehold.co/300x200" },
+        { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "https://placehold.co/300x200.png" },
+        { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "/images/nike.png" },
+        { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "/images/nike.png" },
+
     ];
 
     return (
