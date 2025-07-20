@@ -100,9 +100,9 @@ export default function Playground() {
                         onChangeInput={handleEmailChange}
                         placeholder="Email Texbox"
                         size="M"
-                        color={errorMessage ? "Alert" : "Netral"} // Warna "Alert" jika ada error
+                        color={errorMessage ? "Alert" : "Netral"}
                         type="email"
-                        required={errorMessage == "Alert"}
+                        required={errorMessage ? true : false}
                         requiredMsg={errorMessage}
                     />
 
@@ -147,7 +147,8 @@ export default function Playground() {
                             legendPosition="top"
                             size="M"
                             type="email"
-                            required={errorMessage == "Alert"}
+                            color={errorMessage ? "Alert" : "Netral"}
+                            required={errorMessage ? true : false}
                             requiredMsg={errorMessage}
                         />
                     </div>
@@ -176,42 +177,37 @@ export default function Playground() {
                         value={selectedCity}
                         onChangeSelect={(e) => setSelectedCity(e.target.value)}
                         options={cityOptions}
-                        placeholder="Pilih kota Anda"
+                        placeholder="Select Basic L"
                         size="M"
                         color="Netral"
                     />
 
-                    <div className='min-w-fit'>
-                        <BaseSelect
-                            value={selectedCountry}
-                            onChangeSelect={(e) => setSelectedCountry(e.target.value)}
-                            options={countryOptions}
-                            placeholder="Pilih negara Anda"
-                            size="L"
-                            color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
+                    <BaseSelect
+                        value={selectedCountry}
+                        onChangeSelect={(e) => setSelectedCountry(e.target.value)}
+                        options={countryOptions}
+                        placeholder="Select Required L"
+                        size="L"
+                        color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
 
-                            required={errorMessage === "Alert"}
-                            requiredMsg={errorMessage}
-                        />
-                        {!selectedCountry && (
-                            <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
-                        )}
-                    </div>
+                        required
+                        requiredMsg="Harap pilih negara."
+                    />
 
                     <BaseSelect
                         value={productStatus}
                         onChangeSelect={(e) => setProductStatus(e.target.value)}
                         options={statusOptions}
-                        placeholder="Pilih status"
+                        placeholder="Select disabled S"
                         size="S"
                         color="Netral"
-                        disabled={true} // Contoh: Select dinonaktifkan
+                        disabled
                     />
 
                     <BaseSelect
                         value="option1" // Contoh nilai default
                         onChangeSelect={() => { }}
-                        options={[{ value: 'option1', label: 'Opsi Satu' }, { value: 'option2', label: 'Opsi Dua' }]}
+                        options={[{ value: 'option1', label: 'Select Default XS' }, { value: 'option2', label: 'Opsi Dua' }]}
                         size="XS"
                         color="Netral"
                     />
@@ -243,7 +239,7 @@ export default function Playground() {
                         legendText="Legend Kiri: "
                         typeBox='select'
                         legendPosition='left'
-                        required={true}
+                        required
                         requiredMsg="Harap pilih negara."
                     />
                 </div>

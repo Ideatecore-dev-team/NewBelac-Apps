@@ -20,6 +20,8 @@ export interface BaseTextboxProps {
     size?: SizeVariant;
     color?: ColorVariant;
     withoutOutline?: boolean;
+    required?: boolean;
+    requiredMsg?: string;
 }
 
 const BaseTextbox: React.FC<BaseTextboxProps> = ({
@@ -32,6 +34,8 @@ const BaseTextbox: React.FC<BaseTextboxProps> = ({
     size = "M",
     color = "Netral",
     withoutOutline = false,
+    required = false,
+    requiredMsg = "You must input any value"
 }) => {
 
     const textColorClasses =
@@ -45,14 +49,15 @@ const BaseTextbox: React.FC<BaseTextboxProps> = ({
             : "border-[#2C2C2C] focus:ring-white focus:border-white";
 
     return (
-        <input
-            type={type}
-            value={value}
-            onChange={onChangeInput}
-            placeholder={placeholder}
-            readOnly={readOnly}
-            disabled={disabled}
-            className={`
+        <div className="relative w-full">
+            <input
+                type={type}
+                value={value}
+                onChange={onChangeInput}
+                placeholder={placeholder}
+                readOnly={readOnly}
+                disabled={disabled}
+                className={`
                 ${SizeClasses[size]}
                 ${textColorClasses}
                 ${borderColorClasses}
@@ -69,7 +74,11 @@ const BaseTextbox: React.FC<BaseTextboxProps> = ({
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
                 ${!withoutOutline ? 'focus:ring-1' : ''} 
             `}
-        />
+            />
+            {required && (
+                <p className="text-red-400 text-sm mt-1">{requiredMsg}</p>
+            )}
+        </div>
     );
 };
 
