@@ -12,11 +12,12 @@ const IconTextButton: React.FC<IconTextButtonProps> = ({
     icon,
     onClick,
     withoutOutline = false,
-    size
+    size,
+    color
 }) => {
     return (
         <>
-            <BaseButton size={size} onClick={onClick} withoutOutline={withoutOutline} >
+            <BaseButton color={color} size={size} onClick={onClick} withoutOutline={withoutOutline} >
                 <Image
                     priority
                     height={20}
@@ -24,7 +25,7 @@ const IconTextButton: React.FC<IconTextButtonProps> = ({
                     src={icon}
                     alt={`${label}-button`}
                 />
-                <div className="justify-start text-white text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-tight tracking-wide">{label}</div>
+                <div className="justify-start font-['D-DIN-PRO'] leading-tight tracking-wide">{label}</div>
             </BaseButton>
             {/* <button type="button" className="hover:bg-[#2C2C2C] disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 transition-colors h-14 p-4 bg-transparent rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-start items-center gap-4" onClick={onClick}>
                 <div className="flex justify-center items-center gap-2.5">
