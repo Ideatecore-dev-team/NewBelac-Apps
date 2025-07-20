@@ -11,8 +11,8 @@ const SizeClasses = {
 };
 
 export interface BaseTextboxProps {
-    value: string;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    value: string | number;
+    onChangeInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;
     readOnly?: boolean;
     disabled?: boolean;
@@ -24,7 +24,7 @@ export interface BaseTextboxProps {
 
 const BaseTextbox: React.FC<BaseTextboxProps> = ({
     value,
-    onChange,
+    onChangeInput = () => ({}),
     placeholder,
     readOnly = false,
     disabled = false,
@@ -48,7 +48,7 @@ const BaseTextbox: React.FC<BaseTextboxProps> = ({
         <input
             type={type}
             value={value}
-            onChange={onChange}
+            onChange={onChangeInput}
             placeholder={placeholder}
             readOnly={readOnly}
             disabled={disabled}

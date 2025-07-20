@@ -1,16 +1,20 @@
 import React from "react";
 import BaseTextbox, { BaseTextboxProps } from "./baseTextbox";
+import BaseSelect, { BaseSelectProps } from "./baseSelect";
 
 type LegendPosition = "top" | "left";
+type TypeBox = "input" | "select";
 
-interface LegendTextboxProps extends BaseTextboxProps {
+interface LegendTextboxProps extends BaseTextboxProps, BaseSelectProps {
     legendText: React.ReactNode;
     legendPosition?: LegendPosition;
+    typeBox?: TypeBox
 }
 
 const TailwindTextbox: React.FC<LegendTextboxProps> = ({
     value,
-    onChange,
+    onChangeInput,
+    onChangeSelect,
     placeholder,
     readOnly = false,
     disabled = false,
@@ -19,7 +23,9 @@ const TailwindTextbox: React.FC<LegendTextboxProps> = ({
     color = "Netral",
     withoutOutline = false,
     legendText,
-    legendPosition = "top"
+    legendPosition = "top",
+    typeBox = "input",
+    options = []
 }) => {
     return (
         <div className={`w-full ${legendPosition === "top" ? 'flex flex-col space-y-2' : 'flex items-center space-x-4'}`}>
@@ -28,17 +34,33 @@ const TailwindTextbox: React.FC<LegendTextboxProps> = ({
             `}>
                 {legendText}
             </label>
-            <BaseTextbox
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                readOnly={readOnly}
-                disabled={disabled}
-                type={type}
-                size={size}
-                color={color}
-                withoutOutline={withoutOutline}
-            />
+            {
+                typeBox == "input" && (
+                    <BaseTextbox
+                        value={value}
+                        onChangeInput={onChangeInput}
+                        placeholder={placeholder}
+                        readOnly={readOnly}
+                        disabled={disabled}
+                        type={type}
+                        size={size}
+                        color={color}
+                        withoutOutline={withoutOutline}
+                    />
+                )
+            }
+            {
+                typeBox == "select" && (
+                    <BaseSelect
+                        value={value}
+                        onChangeSelect={onChangeSelect}
+                        options={options}
+                        placeholder="Pilih kota Anda"
+                        size="M"
+                        color="Netral"
+                    />
+                )
+            }
         </div>
     )
 }

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Modal from '../ui/modal/miniModal';
 import { TextButton, IconButton, IconTextButton } from '../ui/button';
-import { BaseTextbox, LegendTextbox, BaseSelect } from '../ui/inputbox';
+import { BaseTextbox, LegendInputBox, BaseSelect } from '../ui/inputbox';
 
 export default function Playground() {
 
@@ -90,14 +90,14 @@ export default function Playground() {
                 <div className="space-x-5">
                     <BaseTextbox
                         value={name}
-                        onChange={handleNameChange}
+                        onChangeInput={handleNameChange}
                         placeholder="Base Textbox"
                         size="M"
                     />
 
                     <BaseTextbox
                         value={email}
-                        onChange={handleEmailChange}
+                        onChangeInput={handleEmailChange}
                         placeholder="Email Texbox"
                         size="M"
                         color={errorMessage ? "Alert" : "Netral"} // Warna "Alert" jika ada error
@@ -108,7 +108,7 @@ export default function Playground() {
 
                     <BaseTextbox
                         value={password}
-                        onChange={handlePasswordChange}
+                        onChangeInput={handlePasswordChange}
                         placeholder="Password Textbox"
                         type="password"
                         size="M"
@@ -136,28 +136,27 @@ export default function Playground() {
                 </div>
 
                 <div className='space-y-5'>
-                    {/* Contoh LegendTextbox - Posisi Top */}
+                    {/* Contoh LegendInputBox - Posisi Top */}
                     <div className="w-full max-w-md">
-                        <LegendTextbox
+                        <LegendInputBox
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChangeInput={(e) => setEmail(e.target.value)}
                             placeholder="Masukan Email"
                             legendText="Legend Atas"
                             legendPosition="top"
                             size="M"
                             type="email"
-                        // color={email.includes('@') ? "Netral" : "Alert"} // Contoh validasi
                         />
                         {!email.includes('@') && email && (
                             <p className="text-red-400 text-sm mt-1">Format email tidak valid.</p>
                         )}
                     </div>
 
-                    {/* Contoh LegendTextbox - Posisi Left */}
+                    {/* Contoh LegendInputBox - Posisi Left */}
                     <div className="w-full max-w-md">
-                        <LegendTextbox
+                        <LegendInputBox
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChangeInput={(e) => setName(e.target.value)}
                             placeholder="Nama Lengkap"
                             legendText="Legend Kiri:"
                             legendPosition="left"
@@ -172,59 +171,80 @@ export default function Playground() {
             <div id="textbox-wrapper" className='w-full space-y-3'>
                 <h1 className="text-2xl font-bold">Select</h1>
 
-                {/* Contoh BaseSelect - Ukuran M, Netral */}
-                <div className="w-full max-w-md">
-                    <label htmlFor="city-select" className="block text-white text-base font-semibold mb-2">Pilih Kota:</label>
+                <div className="w-full flex space-x-2">
                     <BaseSelect
                         value={selectedCity}
-                        onChange={(e) => setSelectedCity(e.target.value)}
+                        onChangeSelect={(e) => setSelectedCity(e.target.value)}
                         options={cityOptions}
                         placeholder="Pilih kota Anda"
                         size="M"
                         color="Netral"
                     />
-                </div>
 
-                {/* Contoh BaseSelect - Ukuran L, Alert (jika belum dipilih) */}
-                <div className="w-full max-w-md">
-                    <label htmlFor="country-select" className="block text-white text-base font-semibold mb-2">Pilih Negara:</label>
-                    <BaseSelect
-                        value={selectedCountry}
-                        onChange={(e) => setSelectedCountry(e.target.value)}
-                        options={countryOptions}
-                        placeholder="Pilih negara Anda"
-                        size="L"
-                        color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
-                    />
-                    {!selectedCountry && (
-                        <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
-                    )}
-                </div>
+                    <div className='min-w-fit'>
+                        <BaseSelect
+                            value={selectedCountry}
+                            onChangeSelect={(e) => setSelectedCountry(e.target.value)}
+                            options={countryOptions}
+                            placeholder="Pilih negara Anda"
+                            size="L"
+                            color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
+                        />
+                        {!selectedCountry && (
+                            <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
+                        )}
+                    </div>
 
-                {/* Contoh BaseSelect - Ukuran S, Disabled */}
-                <div className="w-full max-w-md">
-                    <label htmlFor="status-select" className="block text-white text-base font-semibold mb-2">Status Produk:</label>
                     <BaseSelect
                         value={productStatus}
-                        onChange={(e) => setProductStatus(e.target.value)}
+                        onChangeSelect={(e) => setProductStatus(e.target.value)}
                         options={statusOptions}
                         placeholder="Pilih status"
                         size="S"
                         color="Netral"
                         disabled={true} // Contoh: Select dinonaktifkan
                     />
-                </div>
 
-                {/* Contoh BaseSelect - Ukuran XS */}
-                <div className="w-full max-w-md">
-                    <label htmlFor="small-select" className="block text-white text-base font-semibold mb-2">Opsi Kecil:</label>
                     <BaseSelect
                         value="option1" // Contoh nilai default
-                        onChange={() => { }}
+                        onChangeSelect={() => { }}
                         options={[{ value: 'option1', label: 'Opsi Satu' }, { value: 'option2', label: 'Opsi Dua' }]}
                         size="XS"
                         color="Netral"
                     />
+                </div>
+
+                <LegendInputBox
+                    value={selectedCity}
+                    onChangeSelect={(e) => setSelectedCity(e.target.value)}
+                    options={cityOptions}
+                    placeholder="Pilih kota Anda"
+                    size="M"
+                    color="Netral"
+
+                    // tambah ini bedanya
+                    legendText="Legend Atas"
+                    typeBox='select'
+                />
+
+                <div className='min-w-fit'>
+                    <LegendInputBox
+                        value={selectedCountry}
+                        onChangeSelect={(e) => setSelectedCountry(e.target.value)}
+                        options={countryOptions}
+                        placeholder="Pilih negara Anda"
+                        size="L"
+                        color={selectedCountry ? "Netral" : "Alert"} // Contoh: Warna Alert jika belum ada pilihan
+
+
+                        // tambah ini bedanya
+                        legendText="Legend Kiri: "
+                        typeBox='select'
+                        legendPosition='left'
+                    />
+                    {!selectedCountry && (
+                        <p className="text-red-400 text-sm mt-1">Harap pilih negara.</p>
+                    )}
                 </div>
             </div>
 

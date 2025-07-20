@@ -17,9 +17,9 @@ export interface SelectOption {
 }
 
 export interface BaseSelectProps {
-    options: SelectOption[];
+    options?: SelectOption[];
     value: string | number;
-    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    onChangeSelect?: (event: React.ChangeEvent<| HTMLSelectElement>) => void;
     placeholder?: string;
     disabled?: boolean;
     size?: SizeVariant;
@@ -28,9 +28,9 @@ export interface BaseSelectProps {
 }
 
 const BaseSelect: React.FC<BaseSelectProps> = ({
-    options,
+    options = [],
     value,
-    onChange,
+    onChangeSelect,
     placeholder,
     disabled = false,
     size = "M",
@@ -51,7 +51,7 @@ const BaseSelect: React.FC<BaseSelectProps> = ({
         <div className="relative w-full">
             <select
                 value={value}
-                onChange={onChange}
+                onChange={onChangeSelect}
                 disabled={disabled}
                 className={`
                     ${SizeClasses[size]}
