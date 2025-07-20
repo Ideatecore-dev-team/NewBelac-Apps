@@ -8,6 +8,7 @@ import { LegendInputBox } from "@/app/ui/inputbox";
 
 export default function Collections() {
     const [modalEditCollectionIsOpen, setModalEditCollection] = useState<boolean>(false);
+    const [modalDeleteCollectionIsOpen, setModalDeleteCollection] = useState<boolean>(false);
     const [dataCollectionModal, setDataCollectionModal] = useState({
         ava: '/icons/edit-profile.svg',
         collecionName: "",
@@ -25,13 +26,24 @@ export default function Collections() {
 
     const handleCancelConfirmModalCloseEditModal = () => setModalEditCollection(false);
     const handleCancelActionEditModal = () => {
-        confirm('Data yang sudah diisi akan hilang!');
         setModalEditCollection(false);
+        setModalDeleteCollection(true);
     };
     const handleProceedActionEditModal = () => {
         alert('Aksi Lanjutkan Dilakukan!');
         setModalEditCollection(false);
     };
+
+    const handleCancelConfirmModalCloseDeleteModal = () => setModalDeleteCollection(false);
+    const handleCancelActionDeleteModal = () => {
+        confirm('BNRN dihapus!?!?');
+        setModalDeleteCollection(false);
+    };
+    const handleProceedActionDeleteModal = () => {
+        alert('GJD dihapus!');
+        setModalDeleteCollection(false);
+    };
+
     const handleChangeDataCollectionModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setDataCollectionModal({ ...dataCollectionModal, [prop]: event.target.value })
     }
@@ -98,6 +110,19 @@ export default function Collections() {
                         requiredMsg="You must select any category"
                     />
                 </div>
+            </MiniModal>
+
+            <MiniModal
+                isOpen={modalDeleteCollectionIsOpen}
+                onClose={handleCancelConfirmModalCloseDeleteModal}
+                title="DELETE COLLECTION"
+                onCancel={handleCancelActionDeleteModal}
+                onConfirm={handleProceedActionDeleteModal}
+                cancelButtonText="Continue Delete"
+                icon="/icons/trash-outline-red.svg"
+                confirmButtonText="Cancel"
+            >
+                <div className="self-stretch justify-start text-Color-White-2/70 text-base font-semibold font-['D-DIN-PRO'] leading-snug">Are you sure you want to delete this collection? All items will be burned from the holders’ wallets. The collection itself will remain permanently recorded on the blockchain.</div>
             </MiniModal>
         </div>
     )
