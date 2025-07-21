@@ -39,6 +39,7 @@ const BaseButton: React.FC<BaseButtonProps> = ({
                 transition-colors
                 bg-transparent
                 rounded-md
+                h-fit
                 ${ColorClasses[color]}
                 ${SizeClasses[size]}
                 ${withoutOutline ? "" : "outline outline-offset-[-1px] outline-[#2C2C2C]"}
