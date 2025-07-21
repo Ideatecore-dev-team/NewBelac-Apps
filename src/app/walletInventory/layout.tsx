@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemImage: "",
         itemName: "",
         itemUniqueTag: "#1",
-        itemSize: 0,
+        itemSize: "",
         itemProductDetails: "",
     });
     const menuData = [
@@ -26,7 +26,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleCloseAddItemModal = () => {
         alert('GJD bkin!');
         setModalAddItem(false);
+        setModalAddItem2(false);
     };
+    const handleContinueModalAddItem = () => {
+        setModalAddItem(false);
+        setModalAddItem2(true);
+    }
+    const handleBackModalAddItem = () => {
+        setModalAddItem(true);
+        setModalAddItem2(false);
+    }
+    const handleSaveAddItemModal = () => {
+        setModalAddItem2(false);
+        alert('Data baru masuk ke state aja ya')
+    }
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
     }
@@ -40,7 +53,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 isOpen={modalAddItemIsOpen}
                 onClose={handleCloseAddItemModal}
                 title="ADD ITEM"
-                onConfirm={() => setModalAddItem(false)}
+                onConfirm={handleContinueModalAddItem}
                 confirmButtonText="CONTINUE"
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
@@ -74,7 +87,34 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         disabled
                     />
                 </div>
-            </MiniModal >
+            </MiniModal>
+            <MiniModal
+                isOpen={modalAddItem2IsOpen}
+                onClose={handleCloseAddItemModal}
+                title="ADD ITEM"
+                onConfirm={handleSaveAddItemModal}
+                onCancel={handleBackModalAddItem}
+                cancelButtonText="BACK"
+                confirmButtonText="ADD ITEM"
+            >
+                <div id="add-item-modal-wrapper" className=" space-y-3">
+                    <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Shoes:</span></div>
+                    <LegendInputBox
+                        legendText="Size"
+                        placeholder="Shoses Size"
+                        type="number"
+                        value={dataAddItemModal.itemSize}
+                        onChangeInput={handleChangeAddItemModal('itemSize')}
+                    />
+                    <LegendInputBox
+                        legendText="Product Details"
+                        placeholder="Details"
+                        value={dataAddItemModal.itemProductDetails}
+                        onChangeInput={handleChangeAddItemModal('itemProductDetails')}
+                    />
+                    <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">Please enter all details that correspond to the physical product here (e.g., description, color, etc.).</div>
+                </div>
+            </MiniModal>
         </div >
     )
 }
