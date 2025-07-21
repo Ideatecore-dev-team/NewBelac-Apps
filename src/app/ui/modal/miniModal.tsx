@@ -121,7 +121,11 @@ const MiniModal: React.FC<ModalProps> = ({
                     <div className="flex justify-end  space-x-3">
                         {onCancel && (
                             <div className="content-center">
-                                <IconTextButton color='Alert' withoutOutline size='M' label={cancelButtonText} icon={icon} onClick={onCancel} />
+                                {icon != '' ? (
+                                    <IconTextButton color='Alert' withoutOutline size='M' label={cancelButtonText} icon={icon} onClick={onCancel} />
+                                ) : (
+                                    <TextButton color='Alert' withoutOutline size='M' label={cancelButtonText} onClick={onCancel} />
+                                )}
                             </div>
                         )}
                         {onConfirm && (
