@@ -2,7 +2,7 @@
 import DetailCard from "../ui/collections/detail-card"
 import NavButton from "../ui/navbutton"
 import MiniModal from "../ui/modal/miniModal";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
 import { TextButton } from "../ui/button";
@@ -11,7 +11,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImage: "",
+        itemImagePreview: "https://placehold.co/300x200.png",
+        itemImage: null as File | null,
         itemName: "",
         itemUniqueTag: "#1",
         itemSize: "",
@@ -22,6 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         { label: 'Items', href: '/walletInventory/items' },
     ];
 
+    const fileInputAddItemRef = useRef<HTMLInputElement>(null);
 
     const handleCloseAddItemModal = () => {
         alert('GJD bkin!');
@@ -39,10 +41,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleSaveAddItemModal = () => {
         setModalAddItem2(false);
         alert('Data baru masuk ke state aja ya')
+        // masukin logic store data dari sini ya guys
+        // masukin logic store data dari sini ya guys
     }
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
     }
+    const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setDataAddItemModal({ ...dataAddItemModal, itemImage: file });
+            setDataAddItemModal({ ...dataAddItemModal, itemImagePreview: URL.createObjectURL(file) });
+        }
+    };
+    const handleEditDisplayClick = () => {
+        fileInputAddItemRef.current?.click();
+    };
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
             <DetailCard onClick={() => setModalAddItem(true)} />
@@ -62,16 +76,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             priority
                             height={150}
                             width={100}
-                            src="https://placehold.co/300x200.png"
+                            src={dataAddItemModal.itemImagePreview}
                             alt="item-imagge"
                         />
-                        {/* <div> */}
                         <TextButton
                             label="Edit Item Display"
-                            onClick={() => alert('iya keklik')}
+                            onClick={handleEditDisplayClick}
                             size="S"
                         />
-                        {/* </div> */}
+                        <input
+                            type="file"
+                            ref={fileInputAddItemRef}
+                            onChange={handleImageAddItemChange}
+                            accept="image/png, image/jpeg, image/webp" // Batasi tipe file
+                            className="hidden"
+                        />
                     </div>
                     <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">Item display must match with the physical product.</div>
                     <LegendInputBox
