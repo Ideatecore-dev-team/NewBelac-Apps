@@ -1,6 +1,13 @@
 import Image from "next/image"
+import { IconTextButton } from "../button"
+import { BaseButtonProps } from "../button/baseButton"
 
-export default function DetailCard() {
+interface DetailCardProps extends BaseButtonProps {
+}
+
+const DetailCard: React.FC<DetailCardProps> = ({
+    onClick = () => ({})
+}) => {
     return (
         <div id="detail-card-container" className="w-[1240px] p-4 bg-[#1C1C1C] rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex justify-start items-center gap-8">
             <div id="detail-card-wrapper-left" className="flex-1 flex justify-start items-center gap-4">
@@ -72,20 +79,14 @@ export default function DetailCard() {
                     <div className="self-stretch text-right justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">-</div>
                 </div>
             </div>
-            <button
-                type="button"
-                className="hover:bg-[#2C2C2C] disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 transition-colors h-14 p-4 bg-transparent rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-start items-center gap-4">
-                <Image
-                    priority
-                    height={20}
-                    width={20}
-                    src="/icons/plus.svg"
-                    alt="copy-button"
-                />
-                <div className="flex justify-center items-center gap-2.5">
-                    <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-tight tracking-wide">Add item</div>
-                </div>
-            </button>
+            <IconTextButton
+                onClick={() => onClick()}
+                label={"ADD ITEM"}
+                icon="/icons/plus.svg"
+                size='L'
+            />
         </div>
     )
 }
+
+export default DetailCard;
