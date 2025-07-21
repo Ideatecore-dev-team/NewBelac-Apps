@@ -1,0 +1,28 @@
+import React from 'react';
+import BaseButton, { BaseButtonProps } from './baseButton';
+
+interface TextButtonProps extends BaseButtonProps {
+    label: string
+}
+
+const TextButton: React.FC<TextButtonProps> = ({
+    label,
+    onClick,
+    withoutOutline,
+    size,
+    color
+}) => {
+    return (
+        <>
+            <BaseButton color={color} size={size} onClick={onClick} withoutOutline={withoutOutline} >
+                <div className="justify-start font-['D-DIN-PRO'] leading-tight tracking-wide">{label}</div>
+            </BaseButton>
+            {/* <button type="button" className="hover:bg-[#2C2C2C] disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 transition-colors h-14 p-4 bg-transparent rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-start items-center gap-4" onClick={onClick}>
+                <div className="flex justify-center items-center gap-2.5">
+                </div>
+            </button> */}
+        </>
+    )
+}
+
+export default TextButton;

@@ -1,14 +1,21 @@
 import Image from "next/image"
+import { IconTextButton } from "../button"
+import { BaseButtonProps } from "../button/baseButton"
 
-export default function DetailCard() {
+interface DetailCardProps extends BaseButtonProps {
+}
+
+const DetailCard: React.FC<DetailCardProps> = ({
+    onClick = () => ({})
+}) => {
     return (
-        <div id="detail-card-container" className="w-[1240px] p-4 bg-[#1C1C1C] rounded-md outline outline-1 outline-offset-[-1px] outline-[#2C2C2C] inline-flex justify-start items-center gap-8">
+        <div id="detail-card-container" className="w-[1240px] p-4 bg-[#1C1C1C] rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex justify-start items-center gap-8">
             <div id="detail-card-wrapper-left" className="flex-1 flex justify-start items-center gap-4">
                 <img className="w-14 h-14 relative rounded-full border border-Color-Grey-1" src="https://placehold.co/56x56" />
                 <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
                     <div className="self-stretch inline-flex justify-start items-center gap-4">
                         <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-tight tracking-wide">Nike Realmark</div>
-                        <div className="w-0 h-5 outline outline-1 outline-offset-[-0.50px] outline-[#2C2C2C]" />
+                        <div className="w-0 h-5 outline outline-offset-[-0.50px] outline-[#2C2C2C]" />
                         <div className="flex justify-start items-center gap-4">
                             <Image
                                 priority
@@ -28,17 +35,17 @@ export default function DetailCard() {
                     </div>
                     <div className="inline-flex justify-start items-start gap-3">
                         <div className="flex justify-start items-center gap-3">
-                            <div className="px-2 py-1 bg-[#1C1C1C] rounded outline outline-1 outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
+                            <div className="px-2 py-1 bg-[#1C1C1C] rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
                                 <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">BY </span><span className="text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">0x512c1...c5</span></div>
                             </div>
                         </div>
                         <div className="flex justify-start items-center gap-3">
-                            <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-1 outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
+                            <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
                                 <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Launched </span><span className="text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">June 2025</span></div>
                             </div>
                         </div>
                         <div className="flex justify-start items-center gap-3">
-                            <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-1 outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
+                            <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
                                 <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Shoes </span></div>
                             </div>
                         </div>
@@ -72,20 +79,14 @@ export default function DetailCard() {
                     <div className="self-stretch text-right justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">-</div>
                 </div>
             </div>
-            <button
-                type="button"
-                className="hover:bg-[#2C2C2C] disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 transition-colors h-14 p-4 bg-transparent rounded-md outline outline-1 outline-offset-[-1px] outline-[#2C2C2C] flex justify-start items-center gap-4">
-                <Image
-                    priority
-                    height={20}
-                    width={20}
-                    src="/icons/plus.svg"
-                    alt="copy-button"
-                />
-                <div className="flex justify-center items-center gap-2.5">
-                    <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-tight tracking-wide">Add item</div>
-                </div>
-            </button>
+            <IconTextButton
+                onClick={() => onClick()}
+                label={"ADD ITEM"}
+                icon="/icons/plus.svg"
+                size='L'
+            />
         </div>
     )
 }
+
+export default DetailCard;

@@ -2,21 +2,20 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type ReactNode, useState } from 'react'
-import { type State, WagmiProvider } from 'wagmi'
+import { WagmiProvider } from 'wagmi'
+import { AuthProvider } from '../app/contexts/AuthContext';
+import { config } from '@/wagmi'
 
-import { getConfig } from '@/wagmi'
-
-export function Providers(props: {
-  children: ReactNode
-  initialState?: State
-}) {
-  const [config] = useState(() => getConfig())
+// Komponen ini tidak lagi menerima initialState
+export function Providers(props: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
 
   return (
-    <WagmiProvider config={config} initialState={props.initialState}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        {props.children}
+        <AuthProvider>
+          {props.children}
+        </AuthProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )

@@ -1,18 +1,23 @@
-// components/MenuButton.jsx
-"use client"; // <--- Add this line at the very top
+
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
-export default function MenuButton({ initialMenuItems }: { initialMenuItems: any }) {
-    const router = useRouter();
+type MenuItem = {
+    href: string;
+    label: string;
+};
+
+export default function MenuButton({ initialMenuItems }: { initialMenuItems: MenuItem[] }) {
     const pathname = usePathname();
 
-    const [menuItems, setMenuItems] = useState(initialMenuItems || []);
+    const [menuItems] = useState(initialMenuItems || []);
     const [activeItem, setActiveItem] = useState('');
 
     useEffect(() => {
+        // Sekarang TypeScript tahu bahwa 'item' adalah sebuah MenuItem. Error hilang.
         const foundActive = menuItems.find(item => item.href === pathname);
         if (foundActive) {
             setActiveItem(foundActive.href);
@@ -23,6 +28,7 @@ export default function MenuButton({ initialMenuItems }: { initialMenuItems: any
 
     return (
         <div className="flex py-2">
+            {/* TypeScript juga tahu bahwa 'menu' adalah MenuItem di sini. */}
             {menuItems.map((menu) => (
                 <Link href={menu.href} key={menu.href} passHref>
                     <div
@@ -30,7 +36,6 @@ export default function MenuButton({ initialMenuItems }: { initialMenuItems: any
                         relative flex flex-col items-center justify-center
                         px-2 py-2 text-white text-base font-normal cursor-pointer
                         hover:text-gray-200 transition-colors duration-300
-                        ${activeItem === menu.href ? '' : ''}
                         `}
                     >
                         {menu.label}
