@@ -3,6 +3,7 @@ import { IconButton, IconTextButton } from "../button"
 import { BaseButtonProps } from "../button/baseButton"
 
 interface DetailCardProps extends BaseButtonProps {
+    labelButton: string,
     avaImage?: string,
     label?: string,
     address?: string,
@@ -17,6 +18,7 @@ interface DetailCardProps extends BaseButtonProps {
 
 const DetailCard: React.FC<DetailCardProps> = ({
     onClick = () => ({}),
+    labelButton,
     avaImage = "https://placehold.co/56x56.png",
     label = "...",
     address = "00000",
@@ -136,7 +138,7 @@ const DetailCard: React.FC<DetailCardProps> = ({
             </div>
             <IconTextButton
                 onClick={() => onClick()}
-                label={"ADD ITEM"}
+                label={labelButton}
                 icon="/icons/plus.svg"
                 size='L'
             />
