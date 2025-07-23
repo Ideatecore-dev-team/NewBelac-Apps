@@ -15,6 +15,7 @@ interface ModalProps {
     cancelButtonText?: string; // Teks untuk tombol Cancel, default 'Cancel'
     confirmButtonText?: string; // Teks untuk tombol Confirm, default 'Confirm'
     icon?: string
+    bgColour?: string;
 }
 
 const MiniModal: React.FC<ModalProps> = ({
@@ -26,7 +27,8 @@ const MiniModal: React.FC<ModalProps> = ({
     onConfirm,
     cancelButtonText = 'Batal', // Default text
     confirmButtonText = 'Konfirmasi', // Default text
-    icon = ''
+    icon = '',
+    bgColour = 'bg-black'
 }) => {
     const [mounted, setMounted] = useState<boolean>(false);
     const modalRef = useRef<HTMLDivElement>(null);
@@ -82,7 +84,9 @@ const MiniModal: React.FC<ModalProps> = ({
             {/* MiniModal Content */}
             <div
                 ref={modalRef}
-                className="relative w-auto max-w-lg mx-auto my-6 p-6 rounded-lg shadow-lg bg-black transform transition-all sm:my-8 sm:p-8"
+                className={`relative w-auto max-w-lg mx-auto my-6 p-6 rounded-lg shadow-lg 
+                ${bgColour}
+                transform transition-all sm:my-8 sm:p-8`}
                 tabIndex={-1} // Membuat div ini dapat difokuskan
                 aria-live="assertive" // Memberi tahu screen reader tentang perubahan konten
             >

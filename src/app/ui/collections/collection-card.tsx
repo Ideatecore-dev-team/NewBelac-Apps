@@ -4,7 +4,7 @@ import { IconButton } from "../button"
 
 interface CollectionCardProps {
     data: any,
-    onEditClick?: any
+    onEditClick?: any // setiap CollectionCardProps dipanggil maka props Data dan onEditClick digunakan
 }
 
 const CollectionCard: React.FC<CollectionCardProps> = ({
