@@ -38,21 +38,19 @@ const DetailCard: React.FC<DetailCardProps> = ({
                     <div className="self-stretch inline-flex justify-start items-center gap-4">
                         <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-tight tracking-wide">{label}</div>
                         <div className="w-0 h-5 outline outline-offset-[-0.50px] outline-[#2C2C2C]" />
-                        <div className="flex justify-start items-center gap-4">
+                        <div className="flex justify-start items-center gap-1">
                             <IconButton
                                 icon="/icons/copy-outline.svg"
                                 alt="copy"
                                 size="S"
-                                width={18}
-                                height={18}
+                                withoutOutline
                                 onClick={() => navigator.clipboard.writeText(address)}
                             />
                             <IconButton
                                 icon="/icons/ellipsis-horizontal-outline.svg"
                                 alt="bakso"
                                 size="S"
-                                width={18}
-                                height={18}
+                                withoutOutline
                                 onClick={() => alert("Ini buat apa deh?")}
                             />
                         </div>
