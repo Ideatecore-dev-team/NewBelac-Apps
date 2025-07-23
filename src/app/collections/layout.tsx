@@ -59,7 +59,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
-            <DetailCard onClick={() => setModalAddItem(true)} />
+            <DetailCard
+                label="Nike Realmark"
+                address="0x512c1...c5"
+                category="Shoes"
+                labelButton="ADD ITEM"
+                launchedDate="June 2024"
+                onClick={() => setModalAddItem(true)}
+                floorPrice={0}
+                itemsCount={0}
+                listedCount={0}
+                owner="-"
+            />
             <NavButton initialMenuItems={menuData} />
             <div>{children}</div>
 
