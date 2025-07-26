@@ -60,7 +60,7 @@ export default function MenusNavbarComponents() {
     return (
         <>
             {isEditProfileModalOpen && (
-                <EditProfileModalComponents onClose={handleCloseEditProfile} />
+                <EditProfileModalComponents isOpen={isEditProfileModalOpen} onClose={handleCloseEditProfile} />
             )}
 
             <div className="menus flex items-center gap-[24px]">
@@ -123,7 +123,7 @@ export default function MenusNavbarComponents() {
                     </div>
                     <DropdownNavbarComponents
                         isOpen={isDropdownOpen}
-                        onEditProfile={handleOpenEditProfile}
+                        // onEditProfile={handleOpenEditProfile}
                         onLogout={handleLogoutClick}
                     />
                 </div>

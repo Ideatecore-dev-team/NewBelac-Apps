@@ -1,11 +1,30 @@
 @import "tailwindcss";
 
+/* 1. Definisi Variabel Warna (Theme) */
 :root {
-  background-color: #151516;
-  color: #ffffff;
-  font-family: "D-DIN-PRO";
+  --bg-main: #151516;
+  --bg-grey-1: #2C2C2C;
+  --bg-grey-2: #1C1C1C;
+  --text-main: #ffffff;
 }
 
+/* 2. Aplikasi Style Global */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: "D-DIN-PRO", sans-serif; /* Menambahkan font cadangan (fallback) */
+}
+
+/* 3. Utility Classes menggunakan Variabel */
+.bg-Color-Grey-1 {
+  background-color: var(--bg-grey-1);
+}
+
+.bg-Color-Grey-2 {
+  background-color: var(--bg-grey-2);
+}
+
+/* 4. Definisi Font */
 @font-face {
   font-family: "D-DIN-PRO";
   src: url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.eot");

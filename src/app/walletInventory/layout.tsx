@@ -249,7 +249,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
-      <DetailCard onClick={() => setModalAddItem(true)} />
+      <DetailCard
+                label="0x512c1...c5"
+                labelButton="CREATE COLLECTION"
+                launchedDate="June 2024"
+                onClick={() => setModalAddItem(true)}
+                netWorth={0}
+                itemsCount={0}
+            />
       <NavButton initialMenuItems={menuData} />
       <div>{children}</div>
 
