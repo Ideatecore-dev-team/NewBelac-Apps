@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import MiniModal from '../modal/miniModal'
+import { LegendInputBox } from '../inputbox'
 
 interface EditProfileModalProps {
     isOpen: boolean;
