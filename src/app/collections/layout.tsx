@@ -50,8 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            setDataAddItemModal({ ...dataAddItemModal, itemImage: file });
-            setDataAddItemModal({ ...dataAddItemModal, itemImagePreview: URL.createObjectURL(file) });
+            setDataAddItemModal({ ...dataAddItemModal, itemImage: file, itemImagePreview: URL.createObjectURL(file) });
         }
     };
     const handleEditDisplayClick = () => {
