@@ -1,0 +1,4 @@
+[profile.default]
+src = "src/contract" # Ini memberi tahu Foundry bahwa file sumber kontrak ada di folder 'contract'
+out = "out"      # Ini adalah direktori di mana Foundry akan menyimpan hasil kompilasi
+libs = ["node_modules", "lib"] # Lokasi untuk pustaka Solidity pihak ketiga (misalnya OpenZeppelin)

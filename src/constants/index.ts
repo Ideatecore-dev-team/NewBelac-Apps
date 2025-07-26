@@ -1,0 +1,2 @@
+export const PRODUCT_NFT_ADDRESS = '0x478b0dA71fD04A3288A4cE94815317bC6744bB42'; // from lisk testnet
+export const LISK_TESTNET_CHAIN_ID = 4202; 
