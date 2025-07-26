@@ -5,57 +5,77 @@ import MiniModal from "../ui/modal/miniModal";
 import { useState, useRef } from "react";
 import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
-import { TextButton } from "../ui/button";
+import { IconButton, IconTextButton, TextButton } from "../ui/button";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
-    const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
-    const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImagePreview: "https://placehold.co/300x200.png",
-        itemImage: null as File | null,
-        itemName: "",
-        itemUniqueTag: "#1",
-        itemSize: "",
-        itemProductDetails: "",
+    const [modalAddCollectionIsOpen, setModalAddCollection] = useState<boolean>(false);
+    const [dataAddCollectionModalisError, setDataAddCollectionModalisError] = useState({
+        collectionImage: false,
+        collectionName: false,
+        collectionSymbol: false,
+        collectionCategoy: false,
+    })
+    const [dataAddCollectionModal, setDataAddCollectionModal] = useState({
+        collectionImagePreview: "https://placehold.co/100x100.png",
+        collectionImage: null as File | null,
+        collectionName: "0x512c1...c5",
+        collectionSymbol: "",
+        collectionCategoy: ""
     });
+
+    console.log('ini data colletion', dataAddCollectionModal)
+
+    const categoryOptions = [
+        { value: 'shoes', label: 'Shoes' },
+        { value: 'watch', label: 'Watch' },
+        { value: 'card', label: 'Card' },
+    ];
+
     const menuData = [
         { label: 'Collections', href: '/walletInventory/collections' },
         { label: 'Items', href: '/walletInventory/items' },
     ];
 
-    const fileInputAddItemRef = useRef<HTMLInputElement>(null);
+    const fileInputAddCollectionRef = useRef<HTMLInputElement>(null);
 
-    const handleCloseAddItemModal = () => {
+    const handleCloseAddCollecionModal = () => {
         alert('GJD bkin!');
-        setModalAddItem(false);
-        setModalAddItem2(false);
+        setModalAddCollection(false);
     };
-    const handleContinueModalAddItem = () => {
-        setModalAddItem(false);
-        setModalAddItem2(true);
+    const handleSaveAddCollectionModal = () => {
+        const newErrors = {
+            collectionImage: dataAddCollectionModal.collectionImage === null,
+            collectionName: dataAddCollectionModal.collectionName.trim() === "",
+            collectionSymbol: dataAddCollectionModal.collectionSymbol.trim() === "",
+            collectionCategoy: dataAddCollectionModal.collectionCategoy.trim() === ""
+        };
+        setDataAddCollectionModalisError(newErrors);
+
+        const isFormValid = !Object.values(newErrors).some(error => error);
+        if (isFormValid) {
+            setModalAddCollection(false);
+            alert('Data baru masuk ke state aja ya')
+            // Masukin logic upload di sini
+            // Masukin logic upload di sini
+            // Masukin logic upload di sini
+        }
     }
-    const handleBackModalAddItem = () => {
-        setModalAddItem(true);
-        setModalAddItem2(false);
-    }
-    const handleSaveAddItemModal = () => {
-        setModalAddItem2(false);
-        alert('Data baru masuk ke state aja ya')
-        // masukin logic store data dari sini ya guys
-        // masukin logic store data dari sini ya guys
-    }
+
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
+        setDataAddCollectionModal({ ...dataAddCollectionModal, [prop]: event.target.value })
     }
     const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            setDataAddItemModal({ ...dataAddItemModal, itemImage: file });
-            setDataAddItemModal({ ...dataAddItemModal, itemImagePreview: URL.createObjectURL(file) });
+            setDataAddCollectionModal({
+                ...dataAddCollectionModal,
+                collectionImagePreview: URL.createObjectURL(file),
+                collectionImage: file
+            });
         }
     };
     const handleEditDisplayClick = () => {
-        fileInputAddItemRef.current?.click();
+        fileInputAddCollectionRef.current?.click();
     };
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
@@ -63,7 +83,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 label="0x512c1...c5"
                 labelButton="CREATE COLLECTION"
                 launchedDate="June 2024"
-                onClick={() => setModalAddItem(true)}
+                onClick={() => setModalAddCollection(true)}
                 netWorth={0}
                 itemsCount={0}
             />
@@ -71,74 +91,70 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div>{children}</div>
 
             <MiniModal
-                isOpen={modalAddItemIsOpen}
-                onClose={handleCloseAddItemModal}
+                isOpen={modalAddCollectionIsOpen}
+                onClose={handleCloseAddCollecionModal}
                 title="ADD ITEM"
-                onConfirm={handleContinueModalAddItem}
-                confirmButtonText="CONTINUE"
+                onConfirm={handleSaveAddCollectionModal}
+                confirmButtonText="CREATE COLLECTION"
             >
-                <div id="add-item-modal-wrapper" className=" space-y-3">
-                    <div id="edit-item-display" className="flex items-center space-x-4">
-                        <Image
-                            priority
-                            height={150}
-                            width={100}
-                            src={dataAddItemModal.itemImagePreview}
-                            alt="item-imagge"
-                        />
-                        <TextButton
-                            label="Edit Item Display"
-                            onClick={handleEditDisplayClick}
-                            size="S"
-                        />
-                        <input
-                            type="file"
-                            ref={fileInputAddItemRef}
-                            onChange={handleImageAddItemChange}
-                            accept="image/png, image/jpeg, image/webp" // Batasi tipe file
-                            className="hidden"
-                        />
+                <div id="add-collection-modal-wrapper" className=" space-y-3">
+                    <div id="edit-collection-display" >
+                        <div className="flex items-center space-x-4">
+                            <Image
+                                priority
+                                height={75}
+                                width={75}
+                                className="rounded-[100px]"
+                                src={dataAddCollectionModal.collectionImagePreview}
+                                alt="item-imagge"
+                            />
+                            <IconTextButton
+                                icon="/icons/pencil-outline.svg"
+                                label="Edit Collection Picture"
+                                onClick={handleEditDisplayClick}
+                                size="S"
+                            />
+                            <input
+                                type="file"
+                                ref={fileInputAddCollectionRef}
+                                onChange={handleImageAddItemChange}
+                                accept="image/png, image/jpeg, image/webp" // Batasi tipe file
+                                className="hidden"
+                            />
+                        </div>
+                        {
+                            dataAddCollectionModalisError.collectionImage && (
+                                <p className="text-red-400 text-sm mt-1">You must upload any picture</p>
+                            )
+                        }
                     </div>
                     <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">Item display must match with the physical product.</div>
                     <LegendInputBox
-                        legendText="Item Name"
+                        legendText="Collection Name"
                         placeholder="Name"
-                        value={dataAddItemModal.itemName}
-                        onChangeInput={handleChangeAddItemModal('itemName')}
+                        value={dataAddCollectionModal.collectionName}
+                        onChangeInput={handleChangeAddItemModal('collectionName')}
+                        required={dataAddCollectionModalisError.collectionName}
+                        requiredMsg="You must input the name"
                     />
                     <LegendInputBox
-                        legendText="Unique Tags"
-                        placeholder="Tag"
-                        value={dataAddItemModal.itemUniqueTag}
-                        disabled
-                    />
-                </div>
-            </MiniModal>
-            <MiniModal
-                isOpen={modalAddItem2IsOpen}
-                onClose={handleCloseAddItemModal}
-                title="ADD ITEM"
-                onConfirm={handleSaveAddItemModal}
-                onCancel={handleBackModalAddItem}
-                cancelButtonText="BACK"
-                confirmButtonText="ADD ITEM"
-            >
-                <div id="add-item-modal-wrapper" className=" space-y-3">
-                    <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Shoes:</span></div>
-                    <LegendInputBox
-                        legendText="Size"
-                        placeholder="Shoses Size"
-                        type="number"
-                        value={dataAddItemModal.itemSize}
-                        onChangeInput={handleChangeAddItemModal('itemSize')}
+                        legendText="Symbol"
+                        placeholder="Example. SYMBL"
+                        value={dataAddCollectionModal.collectionSymbol}
+                        onChangeInput={handleChangeAddItemModal('collectionSymbol')}
+                        required={dataAddCollectionModalisError.collectionSymbol}
+                        requiredMsg="You must define the symbol"
                     />
                     <LegendInputBox
-                        legendText="Product Details"
-                        placeholder="Details"
-                        value={dataAddItemModal.itemProductDetails}
-                        onChangeInput={handleChangeAddItemModal('itemProductDetails')}
+                        legendText="Category"
+                        placeholder="Choose Category"
+                        value={dataAddCollectionModal.collectionCategoy}
+                        options={categoryOptions}
+                        typeBox='select'
+                        onChangeSelect={handleChangeAddItemModal('collectionCategoy')}
+                        required={dataAddCollectionModalisError.collectionCategoy}
+                        requiredMsg="You must select any option"
                     />
-                    <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">Please enter all details that correspond to the physical product here (e.g., description, color, etc.).</div>
                 </div>
             </MiniModal>
         </div >

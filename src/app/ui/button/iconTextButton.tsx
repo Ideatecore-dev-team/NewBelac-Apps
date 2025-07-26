@@ -5,7 +5,7 @@ import BaseButton, { BaseButtonProps } from './baseButton';
 const SizeIconClasses = {
     L: 24,
     M: 16,
-    S: 12,
+    S: 14,
     XS: 8,
 }
 
@@ -32,7 +32,7 @@ const IconTextButton: React.FC<IconTextButtonProps> = ({
     return (
         <>
             <BaseButton color={color} onClick={onClick} withoutOutline={withoutOutline} >
-                <div className={`${SizeWrapperClasses[size]} flex justify-center items-center gap-3 justify-start font-['D-DIN-PRO'] leading-tight tracking-wide`}>
+                <div className={`${SizeWrapperClasses[size]} flex justify-center items-center gap-3 font-['D-DIN-PRO'] leading-tight tracking-wide`}>
                     <Image
                         priority
                         height={SizeIconClasses[size]}
