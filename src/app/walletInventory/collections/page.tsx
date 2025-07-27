@@ -6,6 +6,7 @@ import { useState } from "react";
 import { IconTextButton } from "@/app/ui/button";
 import { LegendInputBox } from "@/app/ui/inputbox";
 import { redirect, RedirectType, usePathname } from "next/navigation";
+import BlankPage from "@/app/ui/page/blankPage";
 
 export default function Collections() {
     const [modalEditCollectionIsOpen, setModalEditCollection] = useState<boolean>(false);
@@ -48,13 +49,22 @@ export default function Collections() {
         setDataCollectionModal({ ...dataCollectionModal, [prop]: event.target.value })
     }
     return (
-        <div id="collection-page-container">
+        <div id="collection-page-container" className="h-full">
             <div id="collection-page-subtitle" className="text-Color-White-2/70 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Created collections ({collectionsData.length})</div>
-            <div id="collection-card-wrapper" className="grid grid-cols-4 w-full gap-8">
-                {collectionsData.map((collection, key) => (
-                    <CollectionCard linkHref="/collections/items" onEditClick={() => setModalEditCollection(true)} data={collection} />
-                ))}
-            </div>
+            {
+                collectionsData.length > 0 && (
+                    <div id="collection-card-wrapper" className="grid grid-cols-4 w-full gap-8">
+                        {collectionsData.length > 0 && collectionsData.map((collection, key) => (
+                            <CollectionCard linkHref="/collections/items" onEditClick={() => setModalEditCollection(true)} data={collection} />
+                        ))}
+                    </div>
+                ) || (
+                    <BlankPage
+                        title="No Collections Created"
+                        subtitle="Your created collection will appear here"
+                    />
+                )
+            }
 
             <MiniModal
                 isOpen={modalEditCollectionIsOpen}

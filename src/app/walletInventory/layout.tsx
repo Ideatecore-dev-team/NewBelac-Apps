@@ -79,7 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         fileInputAddCollectionRef.current?.click();
     };
     return (
-        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
+        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col h-full">
             <DetailCard
                 label="0x512c1...c5"
                 labelButton="CREATE COLLECTION"
@@ -89,7 +89,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 itemsCount={0}
             />
             <NavButton initialMenuItems={menuData} />
-            <div>{children}</div>
+            <div className="h-full">
+                {children}
+            </div>
 
             <MiniModal
                 isOpen={modalAddCollectionIsOpen}
