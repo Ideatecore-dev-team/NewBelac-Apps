@@ -1,9 +1,17 @@
 'use client'
 import { useAuth } from '@/app/contexts/AuthContext';
-import BlankPage from "./ui/page/blankPage"
+import BlankPage from "./ui/page/blankPage";
+import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function page() {
-  const { connectors, connect } = useAuth();
+  const { status, connectors, connect } = useAuth();
+
+  useEffect(() => {
+    if (status === 'connected') {
+      redirect('/walletInventory/collections')
+    }
+  }, [status])
 
   const metaMaskConnector = connectors.find(
     (connector) => connector.name === "MetaMask"
