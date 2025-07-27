@@ -1,17 +1,18 @@
 import React from "react"
 import Image from "next/image"
 import { IconButton } from "../button"
+import Link from "next/link"
 
 interface CollectionCardProps {
     data: any,
     onEditClick?: any // setiap CollectionCardProps dipanggil maka props Data dan onEditClick digunakan
-    onBottomCardClick?: any,
+    linkHref: string
 }
 
 const CollectionCard: React.FC<CollectionCardProps> = ({
     data,
     onEditClick,
-    onBottomCardClick
+    linkHref
 }) => {
     return (
         <div id="collection-card-container" className="w-full bg-Color-Grey-2 rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex flex-col justify-start items-start">
@@ -20,7 +21,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                     <IconButton onClick={onEditClick} icon="/icons/pencil-outline.svg" alt="edit-collection" />
                 </div>
             </div>
-            <div onClick={onBottomCardClick} id="collection-card-wrapper-bottom" className="self-stretch bg-[#1C1C1C] px-4 py-4 inline-flex justify-between items-center overflow-hidden cursor-pointer">
+            <Link href={linkHref} id="collection-card-wrapper-bottom" className="self-stretch bg-[#1C1C1C] px-4 py-4 inline-flex justify-between items-center overflow-hidden cursor-pointer">
                 <div className="w-fit inline-flex flex-col justify-start items-start gap-4">
                     <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] leading-none tracking-wide">{data.label || "Not Found!"}</div>
                     <div className="self-stretch h-9 inline-flex justify-start items-start gap-8">
@@ -50,7 +51,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                     </div>
                 </div>
                 <img className="w-12 h-12 relative rounded-[100px] border-2 border-[#2C2C2C]" src={data.ava || "https://placehold.co/48x48"} />
-            </div>
+            </Link>
         </div>
     )
 }
