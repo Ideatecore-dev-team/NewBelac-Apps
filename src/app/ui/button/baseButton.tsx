@@ -14,7 +14,8 @@ export interface BaseButtonProps {
     withoutOutline?: boolean,
     size?: SizeVariant,
     color?: ColorVariant,
-    disabled?: boolean
+    disabled?: boolean,
+    fullWidth?: boolean
 }
 
 const BaseButton: React.FC<BaseButtonProps> = ({
@@ -22,7 +23,8 @@ const BaseButton: React.FC<BaseButtonProps> = ({
     children,
     withoutOutline = false,
     color = "Netral",
-    disabled = false
+    disabled = false,
+    fullWidth = false
 }) => {
     return (
         <>
@@ -34,11 +36,11 @@ const BaseButton: React.FC<BaseButtonProps> = ({
                 bg-transparent
                 rounded-md
                 h-fit
-                w-fit
+                ${fullWidth ? 'w-full' : 'w-fit'}
                 ${ColorClasses[color]}
                 ${withoutOutline ? "" : "outline outline-offset-[-1px] outline-[#2C2C2C]"}
                 flex
-                justify-start
+                justify-center
                 items-center
                 cursor-pointer
             `} onClick={onClick} disabled={disabled}>

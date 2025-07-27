@@ -17,11 +17,12 @@ const TextButton: React.FC<TextButtonProps> = ({
     withoutOutline,
     size = "M",
     color,
-    disabled = false
+    disabled = false,
+    fullWidth = false
 }) => {
     return (
         <>
-            <BaseButton disabled={disabled} color={color} onClick={onClick} withoutOutline={withoutOutline} >
+            <BaseButton fullWidth={fullWidth} disabled={disabled} color={color} onClick={onClick} withoutOutline={withoutOutline} >
                 <div className={`${SizeClasses[size]} justify-start font-['D-DIN-PRO'] leading-tight tracking-wide`}>{label}</div>
             </BaseButton>
         </>
