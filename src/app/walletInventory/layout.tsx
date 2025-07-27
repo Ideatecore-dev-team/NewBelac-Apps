@@ -8,13 +8,6 @@ import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
 import { IconButton, IconTextButton, TextButton } from "../ui/button";
 
-// --- Wagmi Import ---
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
-import { PRODUCT_NFT_ABI } from '../../constants/PRODUCT_NFT_ABI';
-import { PRODUCT_NFT_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
-import { parseAbiItem, keccak256, toBytes } from 'viem'; // Parsing Event Log
-
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddCollectionIsOpen, setModalAddCollection] = useState<boolean>(false);
     const [dataAddCollectionModalisError, setDataAddCollectionModalisError] = useState({

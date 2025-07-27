@@ -2,6 +2,7 @@
 import Image from "next/image"
 import CollectionCard from "@/app/ui/collections/collection-card";
 import MiniModal from "@/app/ui/modal/miniModal";
+import BigModal from "@/app/ui/modal/bigModal";
 import { useState } from "react";
 import { IconTextButton } from "@/app/ui/button";
 import { LegendInputBox } from "@/app/ui/inputbox";
@@ -9,6 +10,28 @@ import { LegendInputBox } from "@/app/ui/inputbox";
 export default function Collections() {
     const [modalEditCollectionIsOpen, setModalEditCollection] = useState<boolean>(false);
     const [modalDeleteCollectionIsOpen, setModalDeleteCollection] = useState<boolean>(false);
+    const [modalDetailItemisOpen, setModalDetailItemIsOpen] = useState<boolean>(false);
+    const [dataItemDetailModal, setDataItemDetailModal] = useState({
+        collectionDetail: {
+            collectionImage: "/images/nike.png",
+            collectionName: "NIKE REALMARK",
+            address: "0x512c1...c5",
+            collectionSymbol: "83e29f",
+            collectionCategoy: ""
+        },
+        itemImage: "/images/shoes.png",
+        itemName: "Nike Air Max 97",
+        itemOwner: "83e29f",
+        itemUniqueTag: "#1",
+        itemSize: "78",
+        itemProductDetails: "",
+        itemPrice: 0,
+        itemisListed: false,
+        itemCondition: {
+            shortDesc: "",
+            longDesc: ""
+        }
+    })
     const [dataCollectionModal, setDataCollectionModal] = useState({
         ava: '/icons/edit-profile.svg',
         collecionName: "",
@@ -24,6 +47,7 @@ export default function Collections() {
         { label: 'Nike Realmark', price: 10.1, items: 68, ava: "/images/nike.png", image: "/images/nike.png" },
     ];
 
+    const handleCloseModalDetailItemModal = () => setModalDetailItemIsOpen(false);
     const handleCancelConfirmModalCloseEditModal = () => setModalEditCollection(false);
     const handleCancelActionEditModal = () => {
         setModalEditCollection(false);
@@ -52,9 +76,24 @@ export default function Collections() {
             <div id="collection-page-subtitle" className="text-Color-White-2/70 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Created collections ({collectionsData.length})</div>
             <div id="collection-card-wrapper" className="grid grid-cols-4 w-full gap-8">
                 {collectionsData.map((collection, key) => (
-                    <CollectionCard onEditClick={() => setModalEditCollection(true)} data={collection} />
+                    <CollectionCard onBottomCardClick={() => setModalDetailItemIsOpen(true)} onEditClick={() => setModalEditCollection(true)} data={collection} />
                 ))}
             </div>
+
+            <BigModal
+                isOpen={modalDetailItemisOpen}
+                collectionImage={dataItemDetailModal.collectionDetail.collectionImage}
+                collectionName={dataItemDetailModal.collectionDetail.collectionName}
+                collectionSymbol={dataItemDetailModal.collectionDetail.collectionSymbol}
+                collectionCategory={dataItemDetailModal.collectionDetail.collectionCategoy}
+                itemImage={dataItemDetailModal.itemImage}
+                itemName={dataItemDetailModal.itemName}
+                itemOwner={dataItemDetailModal.itemOwner}
+                itemPrice={dataItemDetailModal.itemPrice}
+                itemUniqueTag={dataItemDetailModal.itemUniqueTag}
+                itemSize={dataItemDetailModal.itemSize}
+                onClose={handleCloseModalDetailItemModal}
+            />
 
             <MiniModal
                 isOpen={modalEditCollectionIsOpen}

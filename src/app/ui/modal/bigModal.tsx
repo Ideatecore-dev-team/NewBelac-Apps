@@ -8,7 +8,18 @@ import { IconButton } from '../button';
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
-    data?: {};
+    collectionImage: string;
+    collectionName: string;
+    collectionSymbol: string;
+    collectionCategory: string;
+    itemImage: string;
+    itemName: string;
+    itemOwner: string;
+    itemPrice: number;
+    itemUniqueTag: string;
+    itemSize: string;
+    itemProductDetails?: string;
+
     // Props opsional untuk tombol
     onCancel?: () => void; // Fungsi yang dipanggil saat tombol Cancel diklik
     onConfirm?: () => void; // Fungsi yang dipanggil saat tombol Confirm diklik
@@ -23,6 +34,19 @@ const MiniModal: React.FC<ModalProps> = ({
     onClose,
     onCancel,
     onConfirm,
+
+    collectionImage,
+    collectionName,
+    collectionSymbol,
+    collectionCategory,
+    itemImage,
+    itemName,
+    itemOwner,
+    itemPrice,
+    itemUniqueTag,
+    itemSize,
+    itemProductDetails,
+
     cancelButtonText = 'Batal', // Default text
     confirmButtonText = 'Konfirmasi', // Default text
     icon = '',
@@ -90,7 +114,7 @@ const MiniModal: React.FC<ModalProps> = ({
 
                 <div className="rounded-xl w-full inline-flex space-x-6 items-center overflow-hidden">
                     <div className="min-w-[65%] self-stretch inline-flex flex-col justify-start items-start gap-4">
-                        <div className={`self-stretch h-[466px] bg-[url(/images/shoes.png)] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden`}>
+                        <div className={`self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden`}>
                             {/* item image
                         item image
                         item image
@@ -108,7 +132,7 @@ const MiniModal: React.FC<ModalProps> = ({
                         <div className="self-stretch flex flex-col justify-start items-start gap-3">
                             <div className="flex items-center justify-between w-full">
                                 <h3 id="modal-title" className="text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-loose text-white">
-                                    Nike Realmark
+                                    {itemName}
                                 </h3>
                                 <button
                                     onClick={onClose}
@@ -132,23 +156,23 @@ const MiniModal: React.FC<ModalProps> = ({
                                 </button>
                             </div>
                             <div className="self-stretch inline-flex justify-start items-center gap-3">
-                                <img className="w-8 h-8 relative rounded-full border-1 border-Color-Grey-1" src="https://placehold.co/32x32" />
-                                <div className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">NIKE REALMARK</div>
+                                <img className="w-8 h-8 relative rounded-full border-1 border-Color-Grey-1" src={collectionImage} />
+                                <div className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{collectionName}</div>
                             </div>
                             <div className="self-stretch inline-flex justify-start items-center gap-3">
                                 <div className="flex justify-start items-center gap-3">
                                     <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
-                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Owned by </span><span className="text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">83e29f</span></div>
+                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Owned by </span><span className="text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemOwner}</span></div>
                                     </div>
                                 </div>
                                 <div className="flex justify-start items-center gap-3">
                                     <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
-                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">ERC721</span></div>
+                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{collectionSymbol}</span></div>
                                     </div>
                                 </div>
                                 <div className="flex justify-start items-center gap-3">
                                     <div className="px-2 py-1 bg-Color-Grey-2 rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
-                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Shoes</span></div>
+                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{collectionCategory}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -158,14 +182,14 @@ const MiniModal: React.FC<ModalProps> = ({
                                 <div className="inline-flex flex-col justify-start items-start gap-3">
                                     <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Price</div>
                                     <div className="inline-flex justify-start items-center gap-[5px]">
-                                        <div className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">-</div>
+                                        <div className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">{itemPrice === 0 && "-" || itemPrice}</div>
                                     </div>
                                 </div>
                                 <div className="inline-flex flex-col justify-start items-start gap-1.5">
                                     <div className="w-20 justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Unique tags</div>
                                     <div className="inline-flex justify-start items-center gap-1.5">
                                         <div className="bg-Color-Grey-2 rounded flex justify-center items-center gap-1">
-                                            <div className="justify-start text-blue-400 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">#1</div>
+                                            <div className="justify-start text-blue-400 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemUniqueTag}</div>
                                             <IconButton
                                                 icon='/icons/information-circle-outline.svg'
                                                 size='S'
@@ -179,7 +203,7 @@ const MiniModal: React.FC<ModalProps> = ({
                                 </div>
                                 <div className="inline-flex flex-col justify-start items-start gap-3">
                                     <div className="self-stretch text-right justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Size</div>
-                                    <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">78</div>
+                                    <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemSize}</div>
                                 </div>
                             </div>
                             <div data-icon-left="false" data-icon-right="false" data-notification="false" data-property-1="Outline" data-property-2="L" data-property-3="Disabled" data-sep-left="false" data-sep-right="false" data-text="true" className="self-stretch h-14 p-4 bg-Color-Grey-1 rounded-md outline-[#2C2C2C] outline-offset-[-1px] outline-Color-Grey-2 inline-flex justify-center items-start gap-4">
