@@ -156,7 +156,7 @@ const MiniModal: React.FC<ModalProps> = ({
                                 </button>
                             </div>
                             <div className="self-stretch inline-flex justify-start items-center gap-3">
-                                <img className="w-8 h-8 relative rounded-full border-1 border-Color-Grey-1" src={collectionImage} />
+                                <img className="w-10 h-10 relative outline-2 outline-[#2C2C2C] rounded-full" src={collectionImage} />
                                 <div className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{collectionName}</div>
                             </div>
                             <div className="self-stretch inline-flex justify-start items-center gap-3">
