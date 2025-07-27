@@ -1,8 +1,9 @@
 // app/contexts/AuthContext.tsx
 "use client";
 
-import { createContext, useContext, useMemo, ReactNode, FC } from "react";
+import { createContext, useContext, useMemo, ReactNode, FC, useEffect } from "react";
 import { useAccount, useBalance, useConnect, useDisconnect, useSwitchChain } from "wagmi";
+import { redirect, usePathname } from 'next/navigation';
 
 const LSK_TOKEN_ADDRESS = '0x8a21CF9Ba08Ae709D64Cb25AfAA951183EC9FF6D';
 
@@ -10,7 +11,14 @@ function useAuthValue() {
     const { address, status, chainId } = useAccount();
     const { disconnect } = useDisconnect();
     const { connectors, connect } = useConnect();
-    const { switchChain } = useSwitchChain(); 
+    const { switchChain } = useSwitchChain();
+    const pathName = usePathname();
+
+    useEffect(() => {
+        if (status !== 'connected' && pathName !== "/") {
+            redirect('/')
+        }
+    }, [status])
 
     const {
         data: nativeBalanceData,
