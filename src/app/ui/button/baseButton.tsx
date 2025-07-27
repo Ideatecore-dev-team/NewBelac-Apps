@@ -9,18 +9,20 @@ const ColorClasses = {
 }
 
 export interface BaseButtonProps {
-    onClick: () => void,
+    onClick?: () => void,
     children?: React.ReactNode,
     withoutOutline?: boolean,
     size?: SizeVariant,
-    color?: ColorVariant
+    color?: ColorVariant,
+    disabled?: boolean
 }
 
 const BaseButton: React.FC<BaseButtonProps> = ({
     onClick,
     children,
     withoutOutline = false,
-    color = "Netral"
+    color = "Netral",
+    disabled = false
 }) => {
     return (
         <>
@@ -39,7 +41,7 @@ const BaseButton: React.FC<BaseButtonProps> = ({
                 justify-start
                 items-center
                 cursor-pointer
-            `} onClick={onClick}>
+            `} onClick={onClick} disabled={disabled}>
                 <div className="flex justify-center items-center gap-2.5">
                     {children}
                 </div>
