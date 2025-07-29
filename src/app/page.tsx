@@ -4,14 +4,18 @@ import BlankPage from "./ui/page/blankPage";
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { useConnectModal } from '@xellar/kit';
+
 export default function page() {
   const { status, connectors, connect } = useAuth();
+  const { open: openConnectModal } = useConnectModal();
 
   useEffect(() => {
     if (status === 'connected') {
       redirect('/walletInventory/collections')
     }
   }, [status])
+
 
   const metaMaskConnector = connectors.find(
     (connector) => connector.name === "MetaMask"
@@ -22,8 +26,8 @@ export default function page() {
       <BlankPage
         title="welcome to project: realmark"
         subtitle="Start authenticating your physical product"
-        buttonLabel={metaMaskConnector ? 'CONNECT WALLET' : 'METAMASK NOT FOUND'}
-        onClick={() => metaMaskConnector && connect({ connector: metaMaskConnector })}
+        buttonLabel={metaMaskConnector ? 'CONNECT WALLET' : 'WALLET NOT FOUND'}
+        onClick={openConnectModal}
         disabled={!metaMaskConnector}
       />
     </div>
