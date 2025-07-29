@@ -9,17 +9,17 @@ import Image from "next/image";
 import { IconTextButton } from "../ui/button";
 
 // --- Wagmi Imports ---
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
+import { useAuth } from '../contexts/AuthContext'
 import { parseAbiItem, getEventSelector } from 'viem';
 
 // --- Import konstanta yang sudah diperbarui ---
 import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
-import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
+import { COLLECTION_MANAGER_ADDRESS } from '../../constants/index';
+import { abi } from "@/abi";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddCollectionIsOpen, setModalAddCollection] = useState<boolean>(false);
-    
+
     // --- STATE UNTUK FORM KOLEKSI & ERROR ---
     const [dataAddCollectionModalisError, setDataAddCollectionModalisError] = useState({
         collectionImage: false,
@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         collectionName: "",
         collectionCategoy: ""
     });
-    
+
     // --- STATE UNTUK STATUS PROSES ---
     const [isUploadingCollectionImage, setIsUploadingCollectionImage] = useState(false);
     const [isCreatingCollection, setIsCreatingCollection] = useState(false);
@@ -52,11 +52,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const fileInputAddCollectionRef = useRef<HTMLInputElement>(null);
 
     // --- WAGMI HOOKS UNTUK CREATE COLLECTION ---
-    const { data: collectionHash, writeContract, isPending } = useWriteContract();
-    const { isLoading: isConfirmingCreate, isSuccess: isSuccessCreate, data: createReceipt } = useWaitForTransactionReceipt({ hash: collectionHash });
-    const { address, isConnected } = useAccount();
-    const { connect } = useConnect();
-    
+    const {
+        chainId,
+        dataWriteContract,
+        writeContract,
+        writeContractIsPending,
+        useWaitForTransactionReceipt,
+        writeContractError
+    } = useAuth();
+    const {
+        isLoading: isConfirmingCreate,
+        isSuccess: isSuccessCreate,
+        data: createReceipt
+    } = useWaitForTransactionReceipt({ hash: dataWriteContract });
+    const { address, isConnected } = useAuth();
+
     // --- FUNGSI HELPER UPLOAD KE IPFS (PINATA) ---
     // Pastikan Anda mengimplementasikan fungsi ini dengan benar
     const uploadFileToIPFS = async (file: File): Promise<string> => {
@@ -82,7 +92,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsUploadingCollectionImage(false);
         }
     };
-    
+
+    console.log('isSuccessCreate', isSuccessCreate)
+    console.log('writeContractError', writeContractError)
+    console.log('writeContractIsPending', writeContractIsPending)
+    console.log('chainId', chainId)
+
     const handleCloseAddCollecionModal = () => {
         setModalAddCollection(false);
         // Reset state modal
@@ -118,10 +133,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             alert("Please connect your wallet first.");
             return;
         }
-        
+
         setIsCreatingCollection(true);
         setModalAddCollection(false); // Tutup modal setelah data valid
-        
+
         try {
             // 1. Upload gambar koleksi ke IPFS
             const collectionImageUri = await uploadFileToIPFS(dataAddCollectionModal.collectionImage as File);
@@ -129,16 +144,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 setIsCreatingCollection(false);
                 return;
             }
-            
+
             // 2. Panggil kontrak createCollection
-            writeContract({
-                address: COLLECTION_MANAGER_ADDRESS,
-                abi: COLLECTION_MANAGER_ABI,
-                functionName: 'createCollection',
-                args: [dataAddCollectionModal.collectionName, dataAddCollectionModal.collectionCategoy, collectionImageUri],
-                chainId: LISK_TESTNET_CHAIN_ID,
-            });
-            
+            if (writeContract) {
+                await writeContract({
+                    address: await COLLECTION_MANAGER_ADDRESS,
+                    abi: abi,
+                    functionName: 'createCollection',
+                    args: await [dataAddCollectionModal.collectionName, dataAddCollectionModal.collectionCategoy, await collectionImageUri],
+                    chainId: await chainId,
+                });
+            } else {
+                console.error("writeContract is not defined. Ensure useWriteContract is properly called.");
+                alert("Failed to initiate contract transaction. Please try again.");
+            }
+
         } catch (err) {
             console.error("Error creating collection:", err);
             alert(`An error occurred: ${err instanceof Error ? err.message : String(err)}`);
@@ -173,17 +193,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             if (createdLog && createdLog.topics && createdLog.topics[1]) {
                 const collectionId = Number(BigInt(createdLog.topics[1]));
                 setCreatedCollectionId(collectionId);
-                alert(`Collection created! ID: ${collectionId}\nTransaction Hash: ${collectionHash}`);
+                alert(`Collection created! ID: ${collectionId}\nTransaction Hash: ${dataWriteContract}`);
             } else {
                 alert("Collection created, but ID could not be extracted from logs.");
             }
         }
-        if (isSuccessCreate === false && collectionHash && !isConfirmingCreate) {
-             alert("Transaction failed. Check Lisk Block Explorer for details.");
+        if (isSuccessCreate === false && dataWriteContract && !isConfirmingCreate) {
+            alert("Transaction failed. Check Lisk Block Explorer for details.");
         }
-    }, [isSuccessCreate, createReceipt, collectionHash, isConfirmingCreate]);
-    
-    const isProcessPending = isUploadingCollectionImage || isPending || isConfirmingCreate || isCreatingCollection;
+    }, [isSuccessCreate, createReceipt, dataWriteContract, isConfirmingCreate]);
+
+    const isProcessPending = isUploadingCollectionImage || writeContractIsPending || isConfirmingCreate || isCreatingCollection;
 
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col h-full">
@@ -199,10 +219,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className="h-full">
                 {children}
             </div>
-            
+
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">
-                    {isUploadingCollectionImage ? "Uploading image to IPFS..." : (isPending ? "Waiting for wallet confirmation..." : "Creating collection...")}
+                    {isUploadingCollectionImage ? "Uploading image to IPFS..." : (writeContractIsPending ? "Waiting for wallet confirmation..." : "Creating collection...")}
                 </div>
             )}
             {createdCollectionId !== null && (
@@ -210,7 +230,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <p>Collection created with ID: {createdCollectionId}</p>
                 </div>
             )}
-            
+
             <MiniModal
                 isOpen={modalAddCollectionIsOpen}
                 onClose={handleCloseAddCollecionModal}
@@ -271,7 +291,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     />
                 </div>
             </MiniModal>
-            
+
             {/* Modal untuk Add Item jika Anda ingin menambahkannya nanti */}
             {/* ... */}
         </div >
