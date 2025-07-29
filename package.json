@@ -15,6 +15,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-query": "5.45.1",
     "@xellar/kit": "^2.4.0",
+    "@xellar/sdk": "^4.5.2",
     "next": "14.2.4",
     "nft.storage": "^7.2.0",
     "postcss": "^8.5.6",
