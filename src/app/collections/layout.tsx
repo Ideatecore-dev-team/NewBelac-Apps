@@ -1,23 +1,40 @@
 'use client'
+
 import DetailCard from "../ui/collections/detail-card"
 import NavButton from "../ui/navbutton"
 import MiniModal from "../ui/modal/miniModal";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
 import { TextButton } from "../ui/button";
 
+// --- Wagmi Imports ---
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
+import { parseAbiItem, getEventSelector } from 'viem';
+
+// --- Import konstanta yang sudah diperbarui ---
+import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
+import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
+    // --- STATE UNTUK FORM & MODAL "ADD ITEM" ---
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImagePreview: "https://placehold.co/300x200.png",
+        itemImagePreview: "/images/placeholder_300x200.png",
         itemImage: null as File | null,
         itemName: "",
         itemUniqueTag: "#1",
         itemSize: "",
         itemProductDetails: "",
     });
+    
+    // --- STATE UNTUK STATUS PROSES "ADD ITEM" ---
+    const [isUploadingItem, setIsUploadingItem] = useState(false);
+    const [isMinting, setIsMinting] = useState(false);
+    const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
+
     const menuData = [
         { label: 'Items', href: '/collections/items' },
         { label: 'Holder', href: '/collections/holder' },
@@ -25,11 +42,74 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const fileInputAddItemRef = useRef<HTMLInputElement>(null);
 
+    const { address, isConnected } = useAccount();
+    const { connect } = useConnect();
+    
+    // --- WAGMI HOOKS UNTUK ADD ITEM ---
+    const { data: itemHash, writeContract: writeAddItem, isPending: isPendingAdd } = useWriteContract();
+    const { isLoading: isConfirmingAdd, isSuccess: isSuccessAdd, data: addReceipt } = useWaitForTransactionReceipt({ hash: itemHash });
+
+    // --- FUNGSI HELPER UPLOAD KE IPFS (PINATA) ---
+    // Gunakan fungsi yang sudah ada dari alur "Create Collection" atau
+    // implementasikan ulang jika ini adalah satu-satunya file.
+    const uploadFileToIPFS = async (file: File): Promise<string> => {
+        setIsUploadingItem(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await fetch('/api/upload-image-to-ipfs', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS image upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading image to IPFS:", err);
+            alert(`Failed to upload image to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        } finally {
+            setIsUploadingItem(false);
+        }
+    };
+    
+    const uploadJsonToIPFS = async (jsonData: any): Promise<string> => {
+        try {
+            const response = await fetch('/api/upload-json-to-ipfs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS JSON upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading JSON to IPFS:", err);
+            alert(`Failed to upload metadata to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        }
+    };
+
     const handleCloseAddItemModal = () => {
-        alert('GJD bkin!');
         setModalAddItem(false);
         setModalAddItem2(false);
+        setDataAddItemModal({
+            itemImagePreview: "/images/placeholder_300x200.png",
+            itemImage: null,
+            itemName: "",
+            itemUniqueTag: "#1",
+            itemSize: "",
+            itemProductDetails: "",
+        });
+        setMintedTokenId(null);
     };
+
     const handleContinueModalAddItem = () => {
         setModalAddItem(false);
         setModalAddItem2(true);
@@ -38,12 +118,51 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setModalAddItem(true);
         setModalAddItem2(false);
     }
-    const handleSaveAddItemModal = () => {
+    
+    // --- LOGIKA MINTING NFT ---
+    const handleSaveAddItemModal = async () => {
+        if (!dataAddItemModal.itemImage || !dataAddItemModal.itemName || !dataAddItemModal.itemSize || !dataAddItemModal.itemProductDetails) {
+            alert("Please fill all fields.");
+            return;
+        }
+        if (!isConnected) {
+            alert("Please connect your wallet first.");
+            return;
+        }
+
         setModalAddItem2(false);
-        alert('Data baru masuk ke state aja ya')
-        // masukin logic store data dari sini ya guys
-        // masukin logic store data dari sini ya guys
-    }
+        setIsMinting(true);
+
+        try {
+            const imageUri = await uploadFileToIPFS(dataAddItemModal.itemImage as File);
+            if (!imageUri) throw new Error("Failed to upload image.");
+
+            const metadata = {
+                name: dataAddItemModal.itemName,
+                description: dataAddItemModal.itemProductDetails,
+                image: imageUri,
+                attributes: [{ trait_type: "Size", value: dataAddItemModal.itemSize }],
+            };
+            const metadataUri = await uploadJsonToIPFS(metadata);
+            if (!metadataUri) throw new Error("Failed to upload metadata.");
+
+            // Panggil kontrak addItem
+            writeAddItem({
+                address: COLLECTION_MANAGER_ADDRESS,
+                abi: COLLECTION_MANAGER_ABI,
+                functionName: 'addItem',
+                args: [0, metadataUri], // <-- Ganti `0` dengan ID koleksi yang benar
+                chainId: LISK_TESTNET_CHAIN_ID,
+            });
+
+        } catch (err) {
+            console.error("Error minting item:", err);
+            alert(`An error occurred during minting: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+            setIsMinting(false);
+        }
+    };
+    
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
     }
@@ -56,11 +175,31 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleEditDisplayClick = () => {
         fileInputAddItemRef.current?.click();
     };
+
+    // --- useEffect untuk memantau status transaksi "Add Item" ---
+    
+    useEffect(() => {
+    if (isSuccessAdd && addReceipt) {
+        const eventTopic = getEventSelector('ItemAdded(uint256,uint256)');
+        const addedLog = addReceipt.logs.find(log => log.topics && log.topics[0] === eventTopic);
+
+        if (addedLog && addedLog.topics && addedLog.topics[2]) {
+        const tokenId = Number(BigInt(addedLog.topics[2]));
+        setMintedTokenId(tokenId);
+        alert(`Item added! Token ID: ${tokenId}\nTransaction Hash: ${itemHash}`);
+        } else {
+        alert("Item added, but ID could not be extracted from logs.");
+        }
+    }
+    }, [isSuccessAdd, addReceipt, itemHash]);
+    
+    const isProcessPending = isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
+
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
             <DetailCard
                 label="Nike Realmark"
-                address="0x512c1...c5"
+                address={address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected"}
                 category="Shoes"
                 labelButton="ADD ITEM"
                 launchedDate="June 2024"
@@ -72,6 +211,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
             <NavButton initialMenuItems={menuData} />
             <div>{children}</div>
+            
+            {/* Tampilkan status proses */}
+            {isProcessPending && (
+                <div className="text-center mt-4 text-white">
+                    {isUploadingItem ? "Uploading image to IPFS..." : (isPendingAdd ? "Waiting for wallet confirmation..." : "Minting NFT...")}
+                </div>
+            )}
+            {mintedTokenId !== null && (
+                <div className="text-center mt-2 text-green-500 font-bold">
+                    <p>Item minted! Token ID: {mintedTokenId}</p>
+                </div>
+            )}
 
             <MiniModal
                 isOpen={modalAddItemIsOpen}
@@ -79,6 +230,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 title="ADD ITEM"
                 onConfirm={handleContinueModalAddItem}
                 confirmButtonText="CONTINUE"
+                disableConfirm={!isConnected || isProcessPending}
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
                     <div id="edit-item-display" className="flex items-center space-x-4">
@@ -87,7 +239,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             height={150}
                             width={100}
                             src={dataAddItemModal.itemImagePreview}
-                            alt="item-imagge"
+                            alt="item-image"
                         />
                         <TextButton
                             label="Edit Item Display"
@@ -98,7 +250,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             type="file"
                             ref={fileInputAddItemRef}
                             onChange={handleImageAddItemChange}
-                            accept="image/png, image/jpeg, image/webp" // Batasi tipe file
+                            accept="image/png, image/jpeg, image/webp"
                             className="hidden"
                         />
                     </div>
@@ -125,6 +277,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 onCancel={handleBackModalAddItem}
                 cancelButtonText="BACK"
                 confirmButtonText="ADD ITEM"
+                disableConfirm={isProcessPending}
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
                     <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Shoes:</span></div>

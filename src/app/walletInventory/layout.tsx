@@ -6,37 +6,42 @@ import MiniModal from "../ui/modal/miniModal";
 import { useState, useRef, useEffect } from "react";
 import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
-import { IconButton, IconTextButton, TextButton } from "../ui/button";
+import { IconTextButton } from "../ui/button";
 
-// --- Wagmi Import ---
+// --- Wagmi Imports ---
 import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
-import { PRODUCT_NFT_ABI } from '../../constants/PRODUCT_NFT_ABI';
-import { PRODUCT_NFT_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
-import { parseAbiItem, keccak256, toBytes } from 'viem'; // Parsing Event Log
+import { parseAbiItem, getEventSelector } from 'viem';
+
+// --- Import konstanta yang sudah diperbarui ---
+import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
+import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddCollectionIsOpen, setModalAddCollection] = useState<boolean>(false);
+    
+    // --- STATE UNTUK FORM KOLEKSI & ERROR ---
     const [dataAddCollectionModalisError, setDataAddCollectionModalisError] = useState({
         collectionImage: false,
         collectionName: false,
-        collectionSymbol: false,
         collectionCategoy: false,
-    })
+    });
     const [dataAddCollectionModal, setDataAddCollectionModal] = useState({
-        collectionImagePreview: "https://placehold.co/100x100.png",
+        collectionImagePreview: "/images/placeholder_100x100.png",
         collectionImage: null as File | null,
-        collectionName: "0x512c1...c5",
-        collectionSymbol: "",
+        collectionName: "",
         collectionCategoy: ""
     });
-
-    console.log('ini data colletion', dataAddCollectionModal)
+    
+    // --- STATE UNTUK STATUS PROSES ---
+    const [isUploadingCollectionImage, setIsUploadingCollectionImage] = useState(false);
+    const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+    const [createdCollectionId, setCreatedCollectionId] = useState<number | null>(null);
 
     const categoryOptions = [
-        { value: 'shoes', label: 'Shoes' },
-        { value: 'watch', label: 'Watch' },
-        { value: 'card', label: 'Card' },
+        { value: 'Shoes', label: 'Shoes' },
+        { value: 'Watch', label: 'Watch' },
+        { value: 'Card', label: 'Card' },
     ];
 
     const menuData = [
@@ -46,26 +51,99 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const fileInputAddCollectionRef = useRef<HTMLInputElement>(null);
 
-    const handleCloseAddCollecionModal = () => {
-        alert('GJD bkin!');
-        setModalAddCollection(false);
+    // --- WAGMI HOOKS UNTUK CREATE COLLECTION ---
+    const { data: collectionHash, writeContract, isPending } = useWriteContract();
+    const { isLoading: isConfirmingCreate, isSuccess: isSuccessCreate, data: createReceipt } = useWaitForTransactionReceipt({ hash: collectionHash });
+    const { address, isConnected } = useAccount();
+    const { connect } = useConnect();
+    
+    // --- FUNGSI HELPER UPLOAD KE IPFS (PINATA) ---
+    // Pastikan Anda mengimplementasikan fungsi ini dengan benar
+    const uploadFileToIPFS = async (file: File): Promise<string> => {
+        setIsUploadingCollectionImage(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await fetch('/api/upload-image-to-ipfs', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS image upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading image to IPFS:", err);
+            alert(`Failed to upload image to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        } finally {
+            setIsUploadingCollectionImage(false);
+        }
     };
-    const handleSaveAddCollectionModal = () => {
+    
+    const handleCloseAddCollecionModal = () => {
+        setModalAddCollection(false);
+        // Reset state modal
+        setDataAddCollectionModal({
+            collectionImagePreview: "/images/placeholder_100x100.png",
+            collectionImage: null,
+            collectionName: "",
+            collectionCategoy: ""
+        });
+        setDataAddCollectionModalisError({
+            collectionImage: false,
+            collectionName: false,
+            collectionCategoy: false
+        });
+        setCreatedCollectionId(null);
+    };
+
+    const handleSaveAddCollectionModal = async () => {
         const newErrors = {
             collectionImage: dataAddCollectionModal.collectionImage === null,
             collectionName: dataAddCollectionModal.collectionName.trim() === "",
-            collectionSymbol: dataAddCollectionModal.collectionSymbol.trim() === "",
-            collectionCategoy: dataAddCollectionModal.collectionCategoy.trim() === ""
+            collectionCategoy: dataAddCollectionModal.collectionCategoy.trim() === "",
         };
         setDataAddCollectionModalisError(newErrors);
 
         const isFormValid = !Object.values(newErrors).some(error => error);
-        if (isFormValid) {
-            setModalAddCollection(false);
-            alert('Data baru masuk ke state aja ya')
-            // Masukin logic upload di sini
-            // Masukin logic upload di sini
-            // Masukin logic upload di sini
+        if (!isFormValid) {
+            alert("Please fill all required fields.");
+            return;
+        }
+
+        if (!isConnected) {
+            alert("Please connect your wallet first.");
+            return;
+        }
+        
+        setIsCreatingCollection(true);
+        setModalAddCollection(false); // Tutup modal setelah data valid
+        
+        try {
+            // 1. Upload gambar koleksi ke IPFS
+            const collectionImageUri = await uploadFileToIPFS(dataAddCollectionModal.collectionImage as File);
+            if (!collectionImageUri) {
+                setIsCreatingCollection(false);
+                return;
+            }
+            
+            // 2. Panggil kontrak createCollection
+            writeContract({
+                address: COLLECTION_MANAGER_ADDRESS,
+                abi: COLLECTION_MANAGER_ABI,
+                functionName: 'createCollection',
+                args: [dataAddCollectionModal.collectionName, dataAddCollectionModal.collectionCategoy, collectionImageUri],
+                chainId: LISK_TESTNET_CHAIN_ID,
+            });
+            
+        } catch (err) {
+            console.error("Error creating collection:", err);
+            alert(`An error occurred: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+            setIsCreatingCollection(false);
         }
     }
 
@@ -85,10 +163,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleEditDisplayClick = () => {
         fileInputAddCollectionRef.current?.click();
     };
+
+    // --- useEffect untuk memantau status transaksi ---
+    useEffect(() => {
+        if (isSuccessCreate && createReceipt) {
+            const eventSignature = 'event CollectionCreated(uint256 indexed newCollectionId, address indexed creator, string name, string category, string imageUri)';
+            const eventTopic = getEventSelector(parseAbiItem(eventSignature));
+            const createdLog = createReceipt.logs.find(log => log.topics && log.topics[0] === eventTopic);
+            if (createdLog && createdLog.topics && createdLog.topics[1]) {
+                const collectionId = Number(BigInt(createdLog.topics[1]));
+                setCreatedCollectionId(collectionId);
+                alert(`Collection created! ID: ${collectionId}\nTransaction Hash: ${collectionHash}`);
+            } else {
+                alert("Collection created, but ID could not be extracted from logs.");
+            }
+        }
+        if (isSuccessCreate === false && collectionHash && !isConfirmingCreate) {
+             alert("Transaction failed. Check Lisk Block Explorer for details.");
+        }
+    }, [isSuccessCreate, createReceipt, collectionHash, isConfirmingCreate]);
+    
+    const isProcessPending = isUploadingCollectionImage || isPending || isConfirmingCreate || isCreatingCollection;
+
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
             <DetailCard
-                label="0x512c1...c5"
+                label={address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected"}
                 labelButton="CREATE COLLECTION"
                 launchedDate="June 2024"
                 onClick={() => setModalAddCollection(true)}
@@ -97,13 +197,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
             <NavButton initialMenuItems={menuData} />
             <div>{children}</div>
-
+            
+            {isProcessPending && (
+                <div className="text-center mt-4 text-white">
+                    {isUploadingCollectionImage ? "Uploading image to IPFS..." : (isPending ? "Waiting for wallet confirmation..." : "Creating collection...")}
+                </div>
+            )}
+            {createdCollectionId !== null && (
+                <div className="text-center mt-2 text-green-500 font-bold">
+                    <p>Collection created with ID: {createdCollectionId}</p>
+                </div>
+            )}
+            
             <MiniModal
                 isOpen={modalAddCollectionIsOpen}
                 onClose={handleCloseAddCollecionModal}
-                title="ADD ITEM"
+                title="CREATE COLLECTION"
                 onConfirm={handleSaveAddCollectionModal}
                 confirmButtonText="CREATE COLLECTION"
+                disableConfirm={!isConnected || isProcessPending}
             >
                 <div id="add-collection-modal-wrapper" className=" space-y-3">
                     <div id="edit-collection-display" >
@@ -114,7 +226,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 width={75}
                                 className="rounded-[100px]"
                                 src={dataAddCollectionModal.collectionImagePreview}
-                                alt="item-imagge"
+                                alt="collection-image"
                             />
                             <IconTextButton
                                 icon="/icons/pencil-outline.svg"
@@ -126,7 +238,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 type="file"
                                 ref={fileInputAddCollectionRef}
                                 onChange={handleImageAddItemChange}
-                                accept="image/png, image/jpeg, image/webp" // Batasi tipe file
+                                accept="image/png, image/jpeg, image/webp"
                                 className="hidden"
                             />
                         </div>
@@ -146,14 +258,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         requiredMsg="You must input the name"
                     />
                     <LegendInputBox
-                        legendText="Symbol"
-                        placeholder="Example. SYMBL"
-                        value={dataAddCollectionModal.collectionSymbol}
-                        onChangeInput={handleChangeAddItemModal('collectionSymbol')}
-                        required={dataAddCollectionModalisError.collectionSymbol}
-                        requiredMsg="You must define the symbol"
-                    />
-                    <LegendInputBox
                         legendText="Category"
                         placeholder="Choose Category"
                         value={dataAddCollectionModal.collectionCategoy}
@@ -165,6 +269,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     />
                 </div>
             </MiniModal>
+            
+            {/* Modal untuk Add Item jika Anda ingin menambahkannya nanti */}
+            {/* ... */}
         </div >
     )
 }
