@@ -14,28 +14,21 @@ interface TextButtonProps extends BaseButtonProps {
 }
 
 const TextButton: React.FC<TextButtonProps> = ({
-  label,
-  onClick,
-  withoutOutline,
-  size = "M",
-  color,
-  disabled = false // ✅ Default false
+    label,
+    onClick,
+    withoutOutline,
+    size = "M",
+    color,
+    disabled = false,
+    fullWidth = false
 }) => {
-  return (
-    <BaseButton
-      color={color}
-      onClick={onClick}
-      withoutOutline={withoutOutline}
-      disabled={disabled} // ✅ Teruskan ke BaseButton
-      className={`${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} // ✅ Tambahkan styling opsional
-    >
-      <div
-        className={`${SizeClasses[size]} justify-start font-['D-DIN-PRO'] leading-tight tracking-wide`}
-      >
-        {label}
-      </div>
-    </BaseButton>
-  )
+    return (
+        <>
+            <BaseButton fullWidth={fullWidth} disabled={disabled} color={color} onClick={onClick} withoutOutline={withoutOutline} >
+                <div className={`${SizeClasses[size]} justify-start font-['D-DIN-PRO'] leading-tight tracking-wide`}>{label}</div>
+            </BaseButton>
+        </>
+    )
 }
 
 export default TextButton;

@@ -47,7 +47,7 @@ const DetailCard: React.FC<DetailCardProps> = ({
                                 onClick={() => navigator.clipboard.writeText(address || label)}
                             />
                             {
-                                floorPrice && (
+                                floorPrice !== undefined && (
                                     <IconButton
                                         icon="/icons/ellipsis-horizontal-outline.svg"
                                         alt="bakso"

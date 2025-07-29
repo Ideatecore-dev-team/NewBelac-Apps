@@ -186,7 +186,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const isProcessPending = isUploadingCollectionImage || isPending || isConfirmingCreate || isCreatingCollection;
 
     return (
-        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
+        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col h-full">
             <DetailCard
                 label={address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected"}
                 labelButton="CREATE COLLECTION"
@@ -196,7 +196,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 itemsCount={0}
             />
             <NavButton initialMenuItems={menuData} />
-            <div>{children}</div>
+            <div className="h-full">
+                {children}
+            </div>
             
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">
