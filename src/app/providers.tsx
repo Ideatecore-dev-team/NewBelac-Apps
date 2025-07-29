@@ -20,3 +20,4 @@ export function Providers(props: { children: ReactNode }) {
     </WagmiProvider>
   )
 }
+
