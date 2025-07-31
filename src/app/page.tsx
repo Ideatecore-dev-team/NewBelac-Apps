@@ -7,15 +7,20 @@ import { useEffect } from 'react';
 import { useConnectModal } from '@xellar/kit';
 
 export default function page() {
-  const { status, connectors, connect } = useAuth();
+  const { isConnected, connectors, address } = useAuth();
   const { open: openConnectModal } = useConnectModal();
 
   useEffect(() => {
     var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
-    if (status === 'connected') {
+    if (isConnected) {
       redirect(lastPath)
     }
-  }, [status])
+  }, [isConnected])
+
+  if (!address) {
+    console.log('Please connect your wallet.')
+    return;
+  }
 
 
   const metaMaskConnector = connectors.find(
