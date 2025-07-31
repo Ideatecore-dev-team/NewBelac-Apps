@@ -12,10 +12,9 @@ import {
     useWaitForTransactionReceipt,
 } from "wagmi";
 import { redirect, usePathname } from 'next/navigation';
-import { config } from "../../wagmi";
+
 import { LSK_TOKEN_ADDRESS } from "@/constants";
 
-// const LSK_TOKEN_ADDRESS = '0x8a21CF9Ba08Ae709D64Cb25AfAA951183EC9FF6D';
 
 function useAuthValue() {
     const { address, status, isConnected, chainId, chain } = useAccount();
