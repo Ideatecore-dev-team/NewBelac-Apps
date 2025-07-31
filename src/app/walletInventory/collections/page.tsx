@@ -10,6 +10,7 @@ import { useAccount, useReadContract, useReadContracts } from 'wagmi';
 import BlankPage from "@/app/ui/page/blankPage";
 import { COLLECTION_MANAGER_ABI } from "@/constants/COLLECTION_MANAGER_ABI";
 import { COLLECTION_MANAGER_ADDRESS } from "@/constants";
+import { isAddress } from "viem";
 
 export default function Collections() {
     const [modalEditCollectionIsOpen, setModalEditCollection] = useState<boolean>(false);
@@ -29,6 +30,9 @@ export default function Collections() {
     // ])
 
     const { address } = useAccount()
+    if (!address) {
+        return <div>Please connect your wallet.</div>;
+    }
 
     const {
         refetch: refetchGetAllCollection,
@@ -44,7 +48,6 @@ export default function Collections() {
     })
 
     const totalCollections = dataTotalCollectionsData ? Number(dataTotalCollectionsData) : 0;
-
 
     const { data: collectionsData = [], isLoading: isLoadingCollections, isError: isErrorCollections, error: errorCollections } = useReadContracts({
         contracts: Array.from({ length: totalCollections }, (_, i) => ({

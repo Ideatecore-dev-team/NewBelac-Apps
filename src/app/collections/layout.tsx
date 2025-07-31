@@ -29,7 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemSize: "",
         itemProductDetails: "",
     });
-    
+
     // --- STATE UNTUK ERROR VALIDASI FORM "ADD ITEM" ---
     const [dataAddItemModalisError, setDataAddItemModalisError] = useState({
         itemImage: false,
@@ -52,21 +52,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const { address, isConnected } = useAccount();
     const { connect } = useConnect();
-    
+
     // --- WAGMI HOOKS UNTUK ADD ITEM ---
-    const { 
-        data: itemHash, 
-        writeContract: writeAddItem, 
+    const {
+        data: itemHash,
+        writeContract: writeAddItem,
         writeContractAsync: writeAddItemAsync,
-        isPending: isPendingAdd, 
-        error: writeAddError 
+        isPending: isPendingAdd,
+        error: writeAddError
     } = useWriteContract();
-    
-    const { 
-        isLoading: isConfirmingAdd, 
-        isSuccess: isSuccessAdd, 
-        data: addReceipt, 
-        error: confirmAddError 
+
+    const {
+        isLoading: isConfirmingAdd,
+        isSuccess: isSuccessAdd,
+        data: addReceipt,
+        error: confirmAddError
     } = useWaitForTransactionReceipt({ hash: itemHash });
 
     // --- FUNGSI HELPER UPLOAD KE IPFS (PINATA) ---
@@ -93,7 +93,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsUploadingItem(false);
         }
     };
-    
+
     const uploadJsonToIPFS = async (jsonData: any): Promise<string> => {
         try {
             const response = await fetch('/api/upload-json-to-ipfs', {
@@ -192,11 +192,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             if (!metadataUri) throw new Error("Failed to upload metadata.");
 
             // Panggil kontrak addItem
-            await writeAddItemAsync({ 
+            await writeAddItemAsync({
                 address: COLLECTION_MANAGER_ADDRESS,
                 abi: COLLECTION_MANAGER_ABI,
                 functionName: 'addItem',
-                args: [0, metadataUri], // <-- Ganti `0` dengan ID koleksi yang benar
+                args: [BigInt(0), metadataUri], // <-- Ganti `0` dengan ID koleksi yang benar
                 chainId: LISK_TESTNET_CHAIN_ID,
             });
 
@@ -207,7 +207,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsMinting(false);
         }
     };
-    
+
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
     }
@@ -244,13 +244,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             alert(`Add Item failed (Confirmation error): ${'message' in confirmAddError ? confirmAddError.message : 'Unknown error'}. Check Lisk Block Explorer for details.`);
         }
     }, [isSuccessAdd, addReceipt, itemHash, isConfirmingAdd, writeAddError, confirmAddError]);
-    
+
     const isProcessPending = isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
 
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
             <DetailCard
-                label="Nike Realmark" 
+                label="Nike Realmark"
                 address={address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected"}
                 category="Shoes"
                 labelButton="ADD ITEM"
@@ -263,7 +263,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
             <NavButton initialMenuItems={menuData} />
             <div>{children}</div>
-            
+
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">
                     {isUploadingItem ? "Uploading image to IPFS..." : (isPendingAdd ? "Waiting for wallet confirmation..." : "Minting NFT...")}
