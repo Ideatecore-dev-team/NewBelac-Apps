@@ -17,11 +17,6 @@ export default function page() {
     }
   }, [isConnected])
 
-  if (!address) {
-    console.log('Please connect your wallet.')
-    return;
-  }
-
 
   const metaMaskConnector = connectors.find(
     (connector) => connector.name === "MetaMask"
@@ -29,13 +24,17 @@ export default function page() {
 
   return (
     <div className="relative w-full h-full">
-      <BlankPage
-        title="welcome to project: realmark"
-        subtitle="Start authenticating your physical product"
-        buttonLabel={metaMaskConnector ? 'CONNECT WALLET' : 'WALLET NOT FOUND'}
-        onClick={openConnectModal}
-        disabled={!metaMaskConnector}
-      />
+      {
+        !address && (
+          <BlankPage
+            title="welcome to project: realmark"
+            subtitle="Start authenticating your physical product"
+            buttonLabel={metaMaskConnector ? 'CONNECT WALLET' : 'WALLET NOT FOUND'}
+            onClick={openConnectModal}
+            disabled={!metaMaskConnector}
+          />
+        )
+      }
     </div>
   )
 }
