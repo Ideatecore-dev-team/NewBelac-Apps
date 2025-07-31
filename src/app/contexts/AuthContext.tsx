@@ -9,7 +9,7 @@ import {
     useDisconnect,
     useSwitchChain,
     useWriteContract,
-    useWaitForTransactionReceipt
+    useWaitForTransactionReceipt,
 } from "wagmi";
 import { redirect, usePathname } from 'next/navigation';
 import { config } from "../../wagmi";
@@ -22,7 +22,7 @@ function useAuthValue() {
     const { disconnect } = useDisconnect();
     const { connectors, connect, } = useConnect();
     const { switchChain } = useSwitchChain();
-    const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending } = useWriteContract();
+    const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync: writeAddItemAsync } = useWriteContract();
     const pathName = usePathname();
 
     useEffect(() => {
@@ -62,7 +62,8 @@ function useAuthValue() {
         writeContractIsPending,
         isConnected,
         useWaitForTransactionReceipt,
-        writeContractError
+        writeContractError,
+        writeAddItemAsync
     }), [
         address,
         status,
@@ -79,7 +80,8 @@ function useAuthValue() {
         writeContractIsPending,
         isConnected,
         useWaitForTransactionReceipt,
-        writeContractError
+        writeContractError,
+        writeAddItemAsync
     ]);
 }
 type AuthContextType = ReturnType<typeof useAuthValue>;
