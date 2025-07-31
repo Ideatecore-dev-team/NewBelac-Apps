@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         collectionCategoy: false,
     });
     const [dataAddCollectionModal, setDataAddCollectionModal] = useState({
-        collectionImagePreview: "/images/placeholder_100x100.png",
+        collectionImagePreview: "https://placehold.co/100x100.png",
         collectionImage: null as File | null,
         collectionName: "",
         collectionCategoy: ""
@@ -97,7 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleCloseAddCollecionModal = () => {
         setModalAddCollection(false);
         setDataAddCollectionModal({
-            collectionImagePreview: "/images/placeholder_100x100.png",
+            collectionImagePreview: "https://placehold.co/100x100.png",
             collectionImage: null,
             collectionName: "",
             collectionCategoy: ""

@@ -22,10 +22,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImagePreview: "/images/placeholder_300x200.png",
+        itemImagePreview: "https://placehold.co/300x200.png",
         itemImage: null as File | null,
         itemName: "",
-        itemUniqueTag: "#1", 
+        itemUniqueTag: "#1",
         itemSize: "",
         itemProductDetails: "",
     });
@@ -37,7 +37,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemSize: false,
         itemProductDetails: false,
     });
-    
+
     // --- STATE UNTUK STATUS PROSES "ADD ITEM" ---
     const [isUploadingItem, setIsUploadingItem] = useState(false);
     const [isMinting, setIsMinting] = useState(false);
@@ -118,7 +118,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setModalAddItem(false);
         setModalAddItem2(false);
         setDataAddItemModal({
-            itemImagePreview: "/images/placeholder_300x200.png",
+            itemImagePreview: "https://placehold.co/300x200.png",
             itemImage: null,
             itemName: "",
             itemUniqueTag: "#1",
@@ -154,7 +154,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setModalAddItem(true);
         setModalAddItem2(false);
     }
-    
+
     // --- LOGIKA MINTING NFT ---
     const handleSaveAddItemModal = async () => {
         const newErrors = {

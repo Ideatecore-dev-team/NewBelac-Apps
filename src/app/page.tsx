@@ -11,8 +11,9 @@ export default function page() {
   const { open: openConnectModal } = useConnectModal();
 
   useEffect(() => {
+    var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
     if (status === 'connected') {
-      redirect('/walletInventory/collections')
+      redirect(lastPath)
     }
   }, [status])
 
