@@ -11,24 +11,35 @@ import {
     useWriteContract,
     useWaitForTransactionReceipt,
 } from "wagmi";
-import { redirect, usePathname } from 'next/navigation';
+import { redirect, usePathname, useRouter } from 'next/navigation';
 
 import { LSK_TOKEN_ADDRESS } from "@/constants";
 
 
 function useAuthValue() {
-    const { address, status, isConnected, chainId, chain } = useAccount();
+    const { address, status, isConnected, chainId, isReconnecting, isDisconnected } = useAccount();
     const { disconnect } = useDisconnect();
     const { connectors, connect, } = useConnect();
     const { switchChain } = useSwitchChain();
     const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync: writeAddItemAsync } = useWriteContract();
+
+    const router = useRouter();
     const pathName = usePathname();
 
     useEffect(() => {
-        if (status !== 'connected' && pathName !== "/") {
+        var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
+        if (!isConnected && pathName !== "/") {
             redirect('/')
+        } else if (isConnected) {
+            router.push(lastPath)
         }
-    }, [status])
+    }, [isConnected])
+
+    useEffect(() => {
+        if (pathName !== "/") {
+            localStorage.setItem('lastPath', pathName);
+        }
+    }, [pathName])
 
     const {
         data: nativeBalanceData,
@@ -89,7 +100,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const value = useAuthValue();
-    console.log('use auth value', value)
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
