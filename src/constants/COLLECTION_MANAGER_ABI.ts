@@ -152,6 +152,25 @@ export const COLLECTION_MANAGER_ABI =
   },
   {
     "type": "function",
+    "name": "getCollectionsByCreator",
+    "inputs": [
+      {
+        "name": "creatorAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "nft",
     "inputs": [],
     "outputs": [
@@ -253,5 +272,4 @@ export const COLLECTION_MANAGER_ABI =
     ],
     "anonymous": false
   }
-]
-;
+];

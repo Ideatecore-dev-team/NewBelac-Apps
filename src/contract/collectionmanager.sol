@@ -16,6 +16,8 @@ contract CollectionManager is ERC721Holder {
     }
 
     Collection[] public collections;
+    // --- TAMBAHAN DI SINI: Mapping untuk melacak koleksi per pembuat ---
+    mapping(address => uint256[]) private collectionsByCreator;
 
     event CollectionCreated(
         uint256 indexed newCollectionId,
@@ -34,12 +36,13 @@ contract CollectionManager is ERC721Holder {
         nft = ProductNFT(_nftContractAddress);
     }
 
-    
     function createCollection(
         string calldata name,
         string calldata category,
         string calldata imageUri
     ) external returns (uint256 newCollectionId) {
+        require(bytes(imageUri).length > 0, "CollectionManager: imageUri cannot be empty");
+
         newCollectionId = collections.length;
 
         collections.push();
@@ -49,22 +52,22 @@ contract CollectionManager is ERC721Holder {
         col.category = category;
         col.imageUri = imageUri;
 
+        // --- PERBAIKAN DI SINI: Tambahkan ID koleksi ke mapping ---
+        collectionsByCreator[msg.sender].push(newCollectionId);
+
         emit CollectionCreated(newCollectionId, msg.sender, name, category, imageUri);
     }
 
-    /// Menambahkan NFT ke koleksi
     function addItem(
         uint256 targetCollectionId,
         string calldata metadataUri
     ) external returns (uint256 tokenId) {
         require(targetCollectionId < collections.length, "Collection does not exist");
-
-        Collection storage col = collections[targetCollectionId];
-        require(col.creator == msg.sender, "Not collection owner");
+        require(collections[targetCollectionId].creator == msg.sender, "Not collection owner");
 
         tokenId = nft.mintProductNFT(metadataUri);
         nft.safeTransferFrom(address(this), msg.sender, tokenId);
-        col.itemIds.push(tokenId);
+        collections[targetCollectionId].itemIds.push(tokenId);
 
         emit ItemAdded(targetCollectionId, tokenId);
     }
@@ -86,6 +89,15 @@ contract CollectionManager is ERC721Holder {
         return (col.creator, col.name, col.category, col.imageUri, col.itemIds);
     }
 
+    /// --- FUNGSI BARU UNTUK MENGAMBIL SEMUA ID KOLEKSI DARI SEORANG PEMBUAT ---
+    function getCollectionsByCreator(address creatorAddress)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        return collectionsByCreator[creatorAddress];
+    }
+    
     function collectionsCount() external view returns (uint256) {
         return collections.length;
     }
