@@ -22,37 +22,37 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImagePreview: "/images/placeholder_300x200.png",
+        itemImagePreview: "https://placehold.co/300x200.png",
         itemImage: null as File | null,
         itemName: "",
-        itemUniqueTag: "#1", 
+        itemUniqueTag: "#1",
         itemSize: "",
         itemProductDetails: "",
     });
 
     // --- WAGMI HOOKS UNTUK CREATE COLLECTION ---
-        const {
-            chainId,
-            dataWriteContract,
-            writeContract,
-            writeContractIsPending,
-            useWaitForTransactionReceipt,
-            writeContractError,
-            writeAddItemAsync,
-        } = useAuth();
-        const {
-            isLoading: isConfirmingCreate,
-            isSuccess: isSuccessCreate,
-            data: createReceipt
-        } = useWaitForTransactionReceipt({ hash: dataWriteContract });
-        const { address, isConnected } = useAuth();
-        const { 
-        isLoading: isConfirmingAdd, 
-        isSuccess: isSuccessAdd, 
-        data: addReceipt, 
-        error: confirmAddError 
+    const {
+        chainId,
+        dataWriteContract,
+        writeContract,
+        writeContractIsPending,
+        useWaitForTransactionReceipt,
+        writeContractError,
+        writeAddItemAsync,
+    } = useAuth();
+    const {
+        isLoading: isConfirmingCreate,
+        isSuccess: isSuccessCreate,
+        data: createReceipt
     } = useWaitForTransactionReceipt({ hash: dataWriteContract });
-    
+    const { address, isConnected } = useAuth();
+    const {
+        isLoading: isConfirmingAdd,
+        isSuccess: isSuccessAdd,
+        data: addReceipt,
+        error: confirmAddError
+    } = useWaitForTransactionReceipt({ hash: dataWriteContract });
+
     // --- STATE UNTUK ERROR VALIDASI FORM "ADD ITEM" ---
     const [dataAddItemModalisError, setDataAddItemModalisError] = useState({
         itemImage: false,
@@ -60,7 +60,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemSize: false,
         itemProductDetails: false,
     });
-    
+
     // --- STATE UNTUK STATUS PROSES "ADD ITEM" ---
     const [isUploadingItem, setIsUploadingItem] = useState(false);
     const [isMinting, setIsMinting] = useState(false);
@@ -72,11 +72,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     ];
 
     const fileInputAddItemRef = useRef<HTMLInputElement>(null);
-    
+
     // --- WAGMI HOOKS UNTUK ADD ITEM ---
     // Pastikan kita mendapatkan `writeAddItemAsync` dan `error` dari sini
 
-    
+
 
     // --- FUNGSI HELPER UPLOAD KE IPFS (PINATA) ---
     // Fungsi ini digunakan untuk mengunggah gambar item
@@ -103,7 +103,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsUploadingItem(false); // Selesai status uploading
         }
     };
-    
+
     // --- FUNGSI HELPER UNTUK UPLOAD METADATA JSON ---
     const uploadJsonToIPFS = async (jsonData: any): Promise<string> => {
         try {
@@ -130,7 +130,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setModalAddItem2(false);
         // Reset state modal
         setDataAddItemModal({
-            itemImagePreview: "/images/placeholder_300x200.png",
+            itemImagePreview: "https://placehold.co/300x200.png",
             itemImage: null,
             itemName: "",
             itemUniqueTag: "#1",
@@ -167,7 +167,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setModalAddItem(true);
         setModalAddItem2(false);
     }
-    
+
     // --- LOGIKA MINTING NFT ---
     const handleSaveAddItemModal = async () => {
         // Validasi form kedua (size dan product details)
@@ -206,23 +206,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             };
             const metadataUri = await uploadJsonToIPFS(itemMetadata);
             if (!metadataUri) throw new Error("Failed to upload item metadata.");
-            
+
             console.log("Item metadata URI:", metadataUri);
 
             // Panggil kontrak addItem
             try {
-            await writeAddItemAsync({ // Menggunakan async version
-                address: await COLLECTION_MANAGER_ADDRESS,
-                abi: COLLECTION_MANAGER_ABI,
-                functionName: 'addItem',
-                args: [0, metadataUri], // <-- Ganti 0 dengan collectionId yang benar
-                chainId: 4202,
-            });
-            console.log("Transaction hash:", dataWriteContract);
-        } catch (e : any) {
-            console.error("Error writing contract:", e);
-            alert(`Minting failed: ${e.message || e.shortMessage || String(e)}`);
-        }
+                await writeAddItemAsync({ // Menggunakan async version
+                    address: await COLLECTION_MANAGER_ADDRESS,
+                    abi: COLLECTION_MANAGER_ABI,
+                    functionName: 'addItem',
+                    args: [0, metadataUri], // <-- Ganti 0 dengan collectionId yang benar
+                    chainId: 4202,
+                });
+                console.log("Transaction hash:", dataWriteContract);
+            } catch (e: any) {
+                console.error("Error writing contract:", e);
+                alert(`Minting failed: ${e.message || e.shortMessage || String(e)}`);
+            }
 
         } catch (err) {
             console.error("Error minting item:", err);
@@ -235,7 +235,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     console.log(writeContractError);
-    
+
     // --- HANDLER PERUBAHAN INPUT FORM ---
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
@@ -281,7 +281,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         //     alert(`Add Item failed (Confirmation error): ${confirmAddError.shortMessage || confirmAddError.message}. Check Lisk Block Explorer for details.`);
         // }
     }, [isSuccessAdd, addReceipt, dataWriteContract]);
-    
+
     // isProcessPending untuk "Add Item"
     const isProcessPending = isUploadingItem || writeContractIsPending || isConfirmingAdd || isMinting;
 
@@ -301,7 +301,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
             <NavButton initialMenuItems={menuData} />
             <div>{children}</div>
-            
+
             {/* Tampilkan status proses */}
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">
@@ -321,7 +321,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 onConfirm={handleContinueModalAddItem}
                 confirmButtonText="CONTINUE"
                 disableConfirm={!isConnected || isProcessPending}
-                // Anda juga bisa menambahkan `disableCancel` di sini jika ada tombol Cancel di modal 1
+            // Anda juga bisa menambahkan `disableCancel` di sini jika ada tombol Cancel di modal 1
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
                     <div id="edit-item-display" className="flex items-center space-x-4">
@@ -372,7 +372,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 cancelButtonText="BACK"
                 confirmButtonText="ADD ITEM"
                 disableConfirm={isProcessPending}
-                // Anda juga bisa menambahkan `disableCancel` di sini jika ada tombol Cancel
+            // Anda juga bisa menambahkan `disableCancel` di sini jika ada tombol Cancel
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
                     <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Shoes:</span></div>
