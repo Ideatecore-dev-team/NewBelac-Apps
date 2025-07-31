@@ -1,9 +1,13 @@
 'use client'
 
 import Link from "next/link"
-import { useAuth } from '../contexts/AuthContext' 
+import { useAuth } from '../contexts/AuthContext'
 import MenusNavbarComponents from './navbarcomponents/menusNavbarComponents'
 import NormalButtonComponents from "./navbarcomponents/normalButtonComponents"
+import dynamic from "next/dynamic"
+
+const MenusNavbarComponentsNoSSR = dynamic(() => import('./navbarcomponents/menusNavbarComponents'), { ssr: false })
+const NormalButtonComponentsNoSSR = dynamic(() => import('./navbarcomponents/normalButtonComponents'), { ssr: false })
 
 export default function Navbar() {
     const { status } = useAuth()
@@ -18,8 +22,8 @@ export default function Navbar() {
                             <h1 className=" text-[#FFF] text-[16px] font-bold leading-4 tracking-[0.5px]"> REALMARK </h1>
                         </Link>
                     </div>
-                    {status === 'connected' && <MenusNavbarComponents />}
-                    {status !== 'connected' && <NormalButtonComponents />}
+                    {status === 'connected' && <MenusNavbarComponentsNoSSR />}
+                    {status !== 'connected' && <NormalButtonComponentsNoSSR />}
                 </div>
             </nav>
         </>
