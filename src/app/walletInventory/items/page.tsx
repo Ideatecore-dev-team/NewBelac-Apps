@@ -24,9 +24,9 @@ const CollectionCard: FC<CollectionCardProps> = ({ data }) => (
             width={295}
             height={192}
             sizes="(max-width: 295px)"
-            src="/icons/IDRX.svg"
+            src="/images/shoes.png"
             alt={data.label}
-            className="w-[295px] h-[192px] object-cover bg-Color-Grey-1 self-stretch"
+            className="w-[295px] h-[192px]bg-Color-Grey-1 self-stretch"
             onError={(e) => {
                 e.currentTarget.src = `https://placehold.co/295x192/151515/FFF?text=Error`;
             }}
