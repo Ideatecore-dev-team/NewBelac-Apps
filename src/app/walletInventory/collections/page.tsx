@@ -31,10 +31,10 @@ export default function Collections() {
     // ])
 
     const { address } = useAuth()
-    // if (!address) {
-    //     console.log('Please connect your wallet.')
-    //     return;
-    // }
+    if (!address) {
+        console.log('Please connect your wallet.')
+        return;
+    }
 
     const {
         refetch: refetchGetAllCollection,
