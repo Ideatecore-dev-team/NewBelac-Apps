@@ -12,6 +12,7 @@
 body {
   background-color: var(--bg-main);
   color: var(--text-main);
+  background-image: url("../../public/images/cover_bg.png");
   font-family: "D-DIN-PRO", sans-serif; /* Menambahkan font cadangan (fallback) */
 }
 

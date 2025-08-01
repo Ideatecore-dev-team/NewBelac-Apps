@@ -103,10 +103,12 @@ export default function Collections() {
                         ))}
                     </div>
                 ) || (
-                    <BlankPage
+                    <div className="flex justify-center items-center h-[500px] outline-1 outline-offset-[-1px] rounded-2xl outline-[#2c2c2c]">
+                        <BlankPage
                         title="No Collections Created"
                         subtitle="Your created collection will appear here"
                     />
+                    </div>
                 )
             }
 

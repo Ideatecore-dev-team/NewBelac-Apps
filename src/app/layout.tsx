@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 export default function RootLayout(props: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className} suppressHydrationWarning >
+      <body className={inter.className}  suppressHydrationWarning >
         {/* Cukup bungkus dengan Providers tanpa prop apa pun */}
         <Providers>
           <Navbar />
-          <div id='main-container' className='flex center w-full h-lvh'>
+          <div id='main-container' className='flex center w-full h-lvh bg-cover bg-center bg-fixed'>
             <div id='main-wrapper' className='mx-auto'>
               {props.children}
             </div>
