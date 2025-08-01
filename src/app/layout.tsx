@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout(props: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning >
         {/* Cukup bungkus dengan Providers tanpa prop apa pun */}
         <Providers>
           <Navbar />

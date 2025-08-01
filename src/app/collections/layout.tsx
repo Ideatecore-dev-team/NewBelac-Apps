@@ -9,13 +9,16 @@ import Image from "next/image";
 import { TextButton } from "../ui/button";
 
 // --- Wagmi Imports ---
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { keccak256, parseAbiItem } from 'viem';
 
 // --- Import konstanta yang sudah diperbarui ---
 import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
 import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
+import dynamic from "next/dynamic";
+import { useAuth } from "../contexts/AuthContext";
+
+const DetailCardNoSSR = dynamic(() => import('../ui/collections/detail-card'), { ssr: false })
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     // --- STATE UNTUK FORM & MODAL "ADD ITEM" ---
@@ -50,17 +53,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const fileInputAddItemRef = useRef<HTMLInputElement>(null);
 
-    const { address, isConnected } = useAccount();
-    const { connect } = useConnect();
-
     // --- WAGMI HOOKS UNTUK ADD ITEM ---
+
     const {
-        data: itemHash,
+        dataWriteContract: itemHash,
         writeContract: writeAddItem,
         writeContractAsync: writeAddItemAsync,
-        isPending: isPendingAdd,
-        error: writeAddError
-    } = useWriteContract();
+        writeContractIsPending: isPendingAdd,
+        writeContractError: writeAddError,
+        useWaitForTransactionReceipt,
+        address,
+        isConnected
+    } = useAuth()
 
     const {
         isLoading: isConfirmingAdd,
@@ -68,6 +72,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         data: addReceipt,
         error: confirmAddError
     } = useWaitForTransactionReceipt({ hash: itemHash });
+
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    const displayAddress = hasMounted && address
+        ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+        : "Wallet Not Connected";
 
     // --- FUNGSI HELPER UPLOAD KE IPFS (PINATA) ---
     const uploadFileToIPFS = async (file: File): Promise<string> => {
@@ -248,10 +262,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const isProcessPending = isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
 
     return (
-        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
+        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col" suppressHydrationWarning>
             <DetailCard
                 label="Nike Realmark"
-                address={address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected"}
+                address={displayAddress}
                 category="Shoes"
                 labelButton="ADD ITEM"
                 launchedDate="June 2024"
@@ -262,7 +276,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 owner="-"
             />
             <NavButton initialMenuItems={menuData} />
-            <div>{children}</div>
+            {children}
 
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">

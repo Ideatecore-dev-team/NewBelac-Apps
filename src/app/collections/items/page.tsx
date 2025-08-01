@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
 import { useState, FC } from "react";
-
+import { COLLECTION_MANAGER_ABI } from "@/constants/COLLECTION_MANAGER_ABI";
+import { COLLECTION_MANAGER_ADDRESS } from "@/constants";
 import { LegendInputBox } from "@/app/ui/inputbox";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 type FilterStatus = 'All' | 'Listed' | 'Not Listed';
 
@@ -58,13 +60,13 @@ const CollectionCard: FC<CollectionCardProps> = ({ data }) => (
 
 export default function Items() {
     const [activeStatus, setActiveStatus] = useState<FilterStatus>('All');
-
     const [dataCollectionModal, setDataCollectionModal] = useState({
         ava: '/icons/edit-profile.svg',
         collecionName: "",
         collectionSymbol: "",
         collectionCategory: "",
     })
+
 
     const collectionsData: Collection[] = [
         { id: 1, label: 'Nike Realmark A', price: 10.1, items: 68, filterStatus: "Not Listed" },
@@ -80,10 +82,11 @@ export default function Items() {
     const activeButtonClasses = "bg-gradient-to-b from-zinc-900 to-gray-800 shadow-[0px_4px_5px_0px_rgba(71,175,255,0.25)] outline-[#4dacff]";
     const inactiveButtonClasses = "bg-[#1c1c1c] outline-[#2c2c2c]";
 
+
     // 4. Terapkan logika filter SEBELUM melakukan .map()
     const filteredData = collectionsData.filter(collection => {
         if (activeStatus === 'All') {
-            return true; 
+            return true;
         }
         return collection.filterStatus === activeStatus; // Kalau syalah, samakeun statusnya
     });
@@ -94,9 +97,9 @@ export default function Items() {
 
     return (
         <div id="collection-page-container" className="flex flex-col justify-center items-center grow self-stretch bg-[#151515] text-white">
-            {/* <div className="container flex w-full max-w-[1240px] flex-col items-start gap-3">
+            <div className="container flex w-full max-w-[1240px] flex-col items-start gap-3">
                 <div id="collection-page-subtitle" className="text-gray-400 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Owned Items ({filteredData.length})</div>
-            </div> */}
+            </div>
 
             <div className="items-div flex w-full max-w-[1240px] flex-col md:flex-row items-start gap-5">
                 {/* Kolom Filter */}
@@ -121,7 +124,7 @@ export default function Items() {
                             </button>
                         ))}
                     </div>
-{/* 
+                    {/* 
                     <LegendInputBox
                         value={dataCollectionModal.collectionCategory}
                         onChangeSelect={handleChangeDataCollectionModal('collectionCategory')}

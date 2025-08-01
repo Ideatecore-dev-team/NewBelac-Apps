@@ -6,11 +6,12 @@ import { useEffect, useState } from "react";
 import { IconTextButton } from "@/app/ui/button";
 import { LegendInputBox } from "@/app/ui/inputbox";
 import { redirect, RedirectType, usePathname } from "next/navigation";
-import { useAccount, useReadContract, useReadContracts } from 'wagmi';
+import { useReadContract, useReadContracts } from 'wagmi';
 import BlankPage from "@/app/ui/page/blankPage";
 import { COLLECTION_MANAGER_ABI } from "@/constants/COLLECTION_MANAGER_ABI";
 import { COLLECTION_MANAGER_ADDRESS } from "@/constants";
 import { isAddress } from "viem";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function Collections() {
     const [modalEditCollectionIsOpen, setModalEditCollection] = useState<boolean>(false);
@@ -29,10 +30,11 @@ export default function Collections() {
     //     { label: 'Nike Realmark', price: 10.1, items: 68, ava: "/images/nike.png", image: "/images/nike.png" },
     // ])
 
-    const { address } = useAccount()
-    if (!address) {
-        return <div>Please connect your wallet.</div>;
-    }
+    const { address } = useAuth()
+    // if (!address) {
+    //     console.log('Please connect your wallet.')
+    //     return;
+    // }
 
     const {
         refetch: refetchGetAllCollection,

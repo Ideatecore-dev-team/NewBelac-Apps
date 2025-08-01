@@ -21,23 +21,22 @@ function useAuthValue() {
     const { disconnect } = useDisconnect();
     const { connectors, connect, } = useConnect();
     const { switchChain } = useSwitchChain();
-    const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync: writeAddItemAsync } = useWriteContract();
+    const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync } = useWriteContract();
 
-    const router = useRouter();
     const pathName = usePathname();
 
     useEffect(() => {
-        var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
+        // var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
         if (!isConnected && pathName !== "/") {
             redirect('/')
         } else if (isConnected) {
-            router.push(lastPath)
+            // router.push(lastPath)
         }
     }, [isConnected])
 
     useEffect(() => {
         if (pathName !== "/") {
-            localStorage.setItem('lastPath', pathName);
+            // localStorage.setItem('lastPath', pathName);
         }
     }, [pathName])
 
@@ -65,15 +64,16 @@ function useAuthValue() {
         disconnect,
         connectors,
         connect,
+        isConnected,
         chainId,
         switchChain,
+
         writeContract,
         dataWriteContract,
         writeContractIsPending,
-        isConnected,
         useWaitForTransactionReceipt,
         writeContractError,
-        writeAddItemAsync
+        writeContractAsync
     }), [
         address,
         status,
@@ -83,15 +83,16 @@ function useAuthValue() {
         disconnect,
         connectors,
         connect,
+        isConnected,
         chainId,
         switchChain,
+
         writeContract,
         dataWriteContract,
         writeContractIsPending,
-        isConnected,
         useWaitForTransactionReceipt,
         writeContractError,
-        writeAddItemAsync
+        writeContractAsync
     ]);
 }
 type AuthContextType = ReturnType<typeof useAuthValue>;

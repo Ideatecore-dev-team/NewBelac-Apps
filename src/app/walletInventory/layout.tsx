@@ -16,10 +16,11 @@ import { parseAbiItem, getEventSelector } from 'viem';
 // --- Import konstanta yang sudah diperbarui ---
 import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
 import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddCollectionIsOpen, setModalAddCollection] = useState<boolean>(false);
-    
+
     // --- STATE UNTUK FORM KOLEKSI & ERROR ---
     const [dataAddCollectionModalisError, setDataAddCollectionModalisError] = useState({
         collectionImage: false,
@@ -32,7 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         collectionName: "",
         collectionCategoy: ""
     });
-    
+
     // --- STATE UNTUK STATUS PROSES ---
     const [isUploadingCollectionImage, setIsUploadingCollectionImage] = useState(false);
     const [isCreatingCollection, setIsCreatingCollection] = useState(false);
@@ -51,25 +52,38 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const fileInputAddCollectionRef = useRef<HTMLInputElement>(null);
 
+
+    const [hasMounted, setHasMounted] = useState(false);
+
     // --- WAGMI HOOKS UNTUK KONEKSI DAN ACCOUNT ---
-    const { address, isConnected } = useAccount();
-    const { connect } = useConnect();
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     // --- WAGMI HOOKS UNTUK WRITE CONTRACT ---
-    const { 
-        data: collectionHash, 
-        writeContract, 
-        isPending, 
-        error: writeError
-    } = useWriteContract();
-    
-    const { 
-        isLoading: isConfirmingCreate, 
-        isSuccess: isSuccessCreate, 
-        data: createReceipt, 
+
+    const {
+        dataWriteContract: collectionHash,
+        writeContract,
+        writeContractIsPending: isPending,
+        writeContractError: writeError,
+        useWaitForTransactionReceipt,
+        address,
+        isConnected
+    } = useAuth()
+
+    const displayAddress = hasMounted && address
+        ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+        : "Wallet Not Connected";
+
+    const {
+        isLoading: isConfirmingCreate,
+        isSuccess: isSuccessCreate,
+        data: createReceipt,
         error: confirmError
     } = useWaitForTransactionReceipt({ hash: collectionHash });
-    
+
     const uploadFileToIPFS = async (file: File): Promise<string> => {
         setIsUploadingCollectionImage(true);
         try {
@@ -93,7 +107,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsUploadingCollectionImage(false);
         }
     };
-    
+
     const handleCloseAddCollecionModal = () => {
         setModalAddCollection(false);
         setDataAddCollectionModal({
@@ -128,7 +142,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             alert("Please connect your wallet first.");
             return;
         }
-        
+
         setIsCreatingCollection(true);
         setModalAddCollection(false);
 
@@ -138,7 +152,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 setIsCreatingCollection(false);
                 return;
             }
-            
+
             writeContract({
                 address: COLLECTION_MANAGER_ADDRESS,
                 abi: COLLECTION_MANAGER_ABI,
@@ -146,7 +160,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 args: [dataAddCollectionModal.collectionName, dataAddCollectionModal.collectionCategoy, collectionImageUri],
                 chainId: LISK_TESTNET_CHAIN_ID,
             });
-            
+
         } catch (err) {
             console.error("Error creating collection:", err);
             alert(`An error occurred: ${err instanceof Error ? err.message : String(err)}`);
@@ -194,13 +208,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             alert(`Create Collection failed (Confirmation error): ${confirmError.message}. Check Lisk Block Explorer for details.`);
         }
     }, [isSuccessCreate, createReceipt, collectionHash, isConfirmingCreate, writeError, confirmError]);
-    
+
     const isProcessPending = isUploadingCollectionImage || isPending || isConfirmingCreate || isCreatingCollection;
 
     return (
-        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col">
+        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col" suppressHydrationWarning>
             <DetailCard
-                label={address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected"}
+                label={displayAddress}
                 labelButton="CREATE COLLECTION"
                 launchedDate="June 2024"
                 onClick={() => setModalAddCollection(true)}
@@ -209,7 +223,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
             <NavButton initialMenuItems={menuData} />
             <div>{children}</div>
-            
+
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">
                     {isUploadingCollectionImage ? "Uploading image to IPFS..." : (isPending ? "Waiting for wallet confirmation..." : "Creating collection...")}
@@ -220,7 +234,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <p>Collection created with ID: {createdCollectionId}</p>
                 </div>
             )}
-            
+
             <MiniModal
                 isOpen={modalAddCollectionIsOpen}
                 onClose={handleCloseAddCollecionModal}
