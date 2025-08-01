@@ -23,20 +23,21 @@ function useAuthValue() {
     const { switchChain } = useSwitchChain();
     const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync } = useWriteContract();
 
+    const router = useRouter();
     const pathName = usePathname();
 
     useEffect(() => {
-        // var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
+        var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
         if (!isConnected && pathName !== "/") {
             redirect('/')
         } else if (isConnected) {
-            // router.push(lastPath)
+            router.push(lastPath)
         }
     }, [isConnected])
 
     useEffect(() => {
         if (pathName !== "/") {
-            // localStorage.setItem('lastPath', pathName);
+            localStorage.setItem('lastPath', pathName);
         }
     }, [pathName])
 
