@@ -3,9 +3,19 @@ import Image from "next/image"
 import { IconButton } from "../button"
 import Link from "next/link"
 
+// Fungsi helper untuk mengonversi URI IPFS ke URL HTTP
+const resolveIpfsUrl = (ipfsUri: string): string => {
+    if (!ipfsUri) {
+        return "https://placehold.co/300x200.png"; // Placeholder default
+    }
+    const ipfsGatewayUrl = 'https://ipfs.io/ipfs/'; // Atau gateway Pinata Anda
+    const cid = ipfsUri.replace('ipfs://', '');
+    return `${ipfsGatewayUrl}${cid}`;
+};
+
 interface CollectionCardProps {
     data: any,
-    onEditClick?: any // setiap CollectionCardProps dipanggil maka props Data dan onEditClick digunakan
+    onEditClick?: any
     linkHref: string
 }
 
@@ -14,10 +24,27 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
     onEditClick,
     linkHref
 }) => {
+    // Gunakan fungsi helper untuk mendapatkan URL gambar yang valid
+    const imageUrl = resolveIpfsUrl(data.image);
+    const avatarUrl = resolveIpfsUrl(data.ava);
+
     return (
         <div id="collection-card-container" className="w-full bg-Color-Grey-2 rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex flex-col justify-start items-start">
-            <div id="collection-card-wrapper-top" className={`bg-[url(${data.image || "https://placehold.co/300x200"})] self-stretch bg-center bg-cover h-48 relative rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] overflow-hidden`}>
-                <div className={`absolute right-2 top-2 disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 rounded-md`}>
+            <div id="collection-card-wrapper-top" className="self-stretch relative rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] overflow-hidden">
+                {/* PERBAIKAN: Gunakan komponen Image Next.js yang disesuaikan */}
+                <Image
+                    src={imageUrl}
+                    alt={data.label || "Collection Image"}
+                    layout="fill" // Mengisi parent div
+                    objectFit="cover"
+                    className="rounded-md"
+                    // Next.js Image memerlukan width dan height di `layout="fill"`
+                    // atau menggunakan format `fill` dengan parent yang memiliki ukuran
+                    // atau menggunakan `fill` dengan parent yang memiliki ukuran
+                    // Kita akan menggunakan div dengan ukuran tetap 
+                    // Jika Anda ingin menggunakan fill, pastikan parent div punya ukuran
+                />
+                <div className="absolute right-2 top-2 disabled:bg-[#333] disabled:cursor-not-allowed disabled:opacity-50 rounded-md z-10">
                     <IconButton onClick={onEditClick} icon="/icons/pencil-outline.svg" alt="edit-collection" />
                 </div>
             </div>
@@ -50,7 +77,8 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                         </div>
                     </div>
                 </div>
-                <img className="w-12 h-12 relative rounded-[100px] border-2 border-[#2C2C2C]" src={data.ava || "https://placehold.co/48x48"} />
+                {/* PERBAIKAN: Gunakan URL gambar yang dikonversi untuk avatar */}
+                <img className="w-12 h-12 relative rounded-[100px] border-2 border-[#2C2C2C]" src={avatarUrl} alt={data.label || "Avatar"} />
             </Link>
         </div>
     )

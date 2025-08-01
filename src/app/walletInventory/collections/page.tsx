@@ -1,67 +1,72 @@
 'use client'
-import Image from "next/image"
+
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import CollectionCard from "@/app/ui/collections/collection-card";
 import MiniModal from "@/app/ui/modal/miniModal";
-import { useEffect, useState } from "react";
 import { IconTextButton } from "@/app/ui/button";
 import { LegendInputBox } from "@/app/ui/inputbox";
-import { redirect, RedirectType, usePathname } from "next/navigation";
-import { useReadContract, useReadContracts } from 'wagmi';
 import BlankPage from "@/app/ui/page/blankPage";
+import { useReadContract, useReadContracts, useAccount } from 'wagmi';
 import { COLLECTION_MANAGER_ABI } from "@/constants/COLLECTION_MANAGER_ABI";
 import { COLLECTION_MANAGER_ADDRESS } from "@/constants";
-import { isAddress } from "viem";
-import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function Collections() {
     const [modalEditCollectionIsOpen, setModalEditCollection] = useState<boolean>(false);
     const [modalDeleteCollectionIsOpen, setModalDeleteCollection] = useState<boolean>(false);
+    
+    // --- PERBAIKAN: Hapus symbol dari state ---
     const [dataCollectionModal, setDataCollectionModal] = useState({
         ava: '/icons/edit-profile.svg',
         collecionName: "",
-        collectionSymbol: "",
         collectionCategory: "",
     })
-    // const [collectionsData, setCollectionsData] = useState([
-    //     { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "https://placehold.co/300x200.png" },
-    //     { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "https://placehold.co/300x200" },
-    //     { label: 'Nike Realmark', price: 10.1, items: 68, ava: "/images/nike.png", image: "https://placehold.co/300x200.png" },
-    //     { label: 'Nike Realmark', price: 10.1, items: 68, ava: "https://placehold.co/48x48", image: "/images/nike.png" },
-    //     { label: 'Nike Realmark', price: 10.1, items: 68, ava: "/images/nike.png", image: "/images/nike.png" },
-    // ])
 
-    const { address } = useAuth()
-    if (!address) {
-        console.log('Please connect your wallet.')
-        return;
-    }
+    const [collectionsData, setCollectionsData] = useState<any[]>([]);
 
-    const {
-        refetch: refetchGetAllCollection,
-        data: dataTotalCollectionsData,
-        isLoading: isLoadingTotalCollectionsData,
-        isError: isErrorTotalCollectionsData,
-        error: errorTotalCollectionsData
-    } = useReadContract({
+    const { address, isConnected } = useAccount();
+
+    const { data: collectionIds, isLoading: isLoadingCollectionIds, isError: isErrorCollectionIds, error: errorCollectionIds } = useReadContract({
         address: COLLECTION_MANAGER_ADDRESS,
         abi: COLLECTION_MANAGER_ABI,
         functionName: 'getCollectionsByCreator',
-        args: [address]
-    })
-
-    const totalCollections = dataTotalCollectionsData ? Number(dataTotalCollectionsData) : 0;
-
-    const { data: collectionsData = [], isLoading: isLoadingCollections, isError: isErrorCollections, error: errorCollections } = useReadContracts({
-        contracts: Array.from({ length: totalCollections }, (_, i) => ({
-            address: COLLECTION_MANAGER_ADDRESS,
-            abi: COLLECTION_MANAGER_ABI,
-            functionName: 'getCollection',
-            args: [BigInt(i)]
-        })),
+        args: [address as `0x${string}`],
         query: {
-            enabled: totalCollections > 0
+            enabled: isConnected && !!address,
+        }
+    });
+
+    const collectionsReadContracts = (collectionIds || []).map((id: BigInt) => ({
+        address: COLLECTION_MANAGER_ADDRESS,
+        abi: COLLECTION_MANAGER_ABI,
+        functionName: 'getCollection',
+        args: [id]
+    }));
+
+    const { data: collectionsRawData = [], isLoading: isLoadingCollections, isError: isErrorCollections, error: errorCollections } = useReadContracts({
+        contracts: collectionsReadContracts,
+        query: {
+            enabled: !isLoadingCollectionIds && ((collectionIds?.length ?? 0) > 0)
         },
     });
+
+    useEffect(() => {
+        if (collectionsRawData && collectionsRawData.length > 0 && !isLoadingCollections && collectionIds) {
+            const formattedData = collectionsRawData.map((res: any, index: number) => {
+                const [creator, name, category, imageUri, itemIds] = res.result;
+                return {
+                    id: collectionIds[index],
+                    label: name,
+                    category: category,
+                    price: 0,
+                    items: itemIds.length,
+                    ava: imageUri,
+                    image: imageUri,
+                };
+            });
+            setCollectionsData(formattedData);
+        }
+    }, [collectionsRawData, isLoadingCollections, collectionIds]);
 
     const handleCancelConfirmModalCloseEditModal = () => setModalEditCollection(false);
     const handleCancelActionEditModal = () => {
@@ -82,32 +87,42 @@ export default function Collections() {
         alert('GJD dihapus!');
         setModalDeleteCollection(false);
     };
+    
+    // --- PERBAIKAN: Hapus symbol dari state dan destructuring ---
     const handleChangeDataCollectionModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setDataCollectionModal({ ...dataCollectionModal, [prop]: event.target.value })
     }
 
-    // useEffect(() => {
-    //     if (!isErrorGetAllCollection && !isErrorGetAllCollection && !isLoadingGetAllCollection && dataGetAllCollection) {
-    //         // ntr masukin sini 
-    //     }
-    // }, [dataGetAllCollection])
-
     return (
         <div id="collection-page-container" className="h-full w-[1240px]">
-            <div id="collection-page-subtitle" className="h-full text-Color-White-2/70 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Created collections ({collectionsData.length})</div>
+            <div id="collection-page-subtitle" className="h-full text-Color-White-2/70 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">
+                Created collections ({collectionsData.length})
+            </div>
             {
-                collectionsData?.length > 0 && (
+                (isLoadingCollectionIds || isLoadingCollections) && <p>Loading collections...</p>
+            }
+            {
+                isErrorCollectionIds && <p>Error loading collection IDs: {errorCollectionIds?.message}</p>
+            }
+            {
+                isErrorCollections && <p>Error loading collection data: {errorCollections?.message}</p>
+            }
+            {
+                collectionsData.length > 0 && (
                     <div id="collection-card-wrapper" className="grid grid-cols-4 w-full gap-8">
-                        {collectionsData.length > 0 && collectionsData.map((collection, key) => (
-                            <CollectionCard linkHref="/collections/items" onEditClick={() => setModalEditCollection(true)} data={collection} />
+                        {collectionsData.map((collection, key) => (
+                            <CollectionCard key={key} linkHref={`/collections/items?collectionId=${collection.id}`} onEditClick={() => setModalEditCollection(true)} data={collection} />
                         ))}
                     </div>
-                ) || (
+                )
+            }
+            {
+                !isLoadingCollections && collectionsData.length === 0 && (
                     <div className="flex justify-center items-center h-[500px] outline-1 outline-offset-[-1px] rounded-2xl outline-[#2c2c2c]">
                         <BlankPage
                         title="No Collections Created"
                         subtitle="Your created collection will appear here"
-                    />
+                        />
                     </div>
                 )
             }
@@ -142,15 +157,10 @@ export default function Collections() {
                         legendPosition="top"
                         size="M"
                     />
-                    <LegendInputBox
-                        value={dataCollectionModal.collectionSymbol}
-                        onChangeInput={handleChangeDataCollectionModal('collectionSymbol')}
-                        placeholder="Example SYMBL"
-                        legendText="Symbol"
-                        legendPosition="top"
-                        size="M"
-                    />
-
+                    
+                    {/* --- PERBAIKAN: Hapus LegendInputBox untuk symbol --- */}
+                    {/* Anda bisa menambahkan ini kembali jika diperlukan di masa depan */}
+                    
                     <LegendInputBox
                         value={dataCollectionModal.collectionCategory}
                         onChangeSelect={handleChangeDataCollectionModal('collectionCategory')}
@@ -158,8 +168,6 @@ export default function Collections() {
                         placeholder="Select Category"
                         size="M"
                         color="Netral"
-
-                        // tambah ini bedanya
                         legendText="Category"
                         typeBox='select'
                         required

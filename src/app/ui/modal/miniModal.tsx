@@ -28,7 +28,7 @@ const MiniModal: React.FC<ModalProps> = ({
   cancelButtonText = 'Batal',
   confirmButtonText = 'Konfirmasi',
   icon = '',
-  bgColour = 'bg-black',
+  bgColour = 'bg-[#1c1c1c]',
   disableConfirm = false // <-- ✅ Default false
 }) => {
   const [mounted, setMounted] = useState<boolean>(false);
@@ -79,7 +79,7 @@ const MiniModal: React.FC<ModalProps> = ({
       {/* MiniModal Content */}
       <div
         ref={modalRef}
-        className={`relative w-auto max-w-lg mx-auto my-6 p-6 rounded-lg shadow-lg 
+        className={`relative w-auto max-w-lg mx-auto my-6 p-6 rounded-lg shadow-lg outline-1 outline-offset-[-1px] outline-[#2c2c2c]
         ${bgColour}
         transform transition-all sm:my-8 sm:p-8`}
         tabIndex={-1}
