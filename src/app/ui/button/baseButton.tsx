@@ -4,8 +4,8 @@ type SizeVariant = "L" | "M" | "S" | "XS";
 export type ColorVariant = "Netral" | "Alert";
 
 const ColorClasses = {
-    Netral: 'text-white hover:bg-[#2C2C2C]',
-    Alert: 'text-red-400 hover:bg-[#fdd3e5]',
+  Netral: 'text-white hover:bg-gradient-to-b hover:from-zinc-900 hover:to-gray-800 hover:outline-[#4CABFF] hover:shadow-[0px_4px_5px_0px_rgba(71,175,255,0.25)] ',
+  Alert: 'text-red-400 hover:bg-[#fdd3e5]',
 };
 
 export interface BaseButtonProps {
