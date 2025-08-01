@@ -93,7 +93,7 @@ export default function Collections() {
     // }, [dataGetAllCollection])
 
     return (
-        <div id="collection-page-container" className="h-full">
+        <div id="collection-page-container" className="h-full w-[1240px]">
             <div id="collection-page-subtitle" className="h-full text-Color-White-2/70 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Created collections ({collectionsData.length})</div>
             {
                 collectionsData?.length > 0 && (

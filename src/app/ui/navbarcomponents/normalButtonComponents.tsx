@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/app/contexts/AuthContext';
 import { ConnectButton } from '@xellar/kit';
+import BaseButton from '../button/baseButton';
 
 export default function CustomButtonComponent() {
 
