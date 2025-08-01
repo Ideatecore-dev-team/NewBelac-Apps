@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 
 import { useConnectModal } from '@xellar/kit';
 
+import Hero from './ui/homePageComponents/hero'
+
 export default function page() {
   const { isConnected, connectors, address } = useAuth();
   const { open: openConnectModal } = useConnectModal();
@@ -26,13 +28,14 @@ export default function page() {
     <div className="relative w-full h-full">
       {
         !address && (
-          <BlankPage
-            title="welcome to project: realmark"
-            subtitle="Start authenticating your physical product"
-            buttonLabel={metaMaskConnector ? 'CONNECT WALLET' : 'WALLET NOT FOUND'}
-            onClick={openConnectModal}
-            disabled={!metaMaskConnector}
-          />
+          // <BlankPage
+          //   title="welcome to project: realmark"
+          //   subtitle="Start authenticating your physical product"
+          //   buttonLabel={metaMaskConnector ? 'CONNECT WALLET' : 'WALLET NOT FOUND'}
+          //   onClick={openConnectModal}
+          //   disabled={!metaMaskConnector}
+          // />
+          <Hero/>
         )
       }
     </div>

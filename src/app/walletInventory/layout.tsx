@@ -8,8 +8,6 @@ import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
 import { IconTextButton } from "../ui/button";
 
-// --- Wagmi Imports (standar) ---
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { parseAbiItem, getEventSelector } from 'viem';
 

@@ -96,7 +96,7 @@ export default function Items() {
     }
 
     return (
-        <div id="collection-page-container" className="flex flex-col justify-center items-center grow self-stretch bg-[#151515] text-white">
+        <div id="collection-page-container" className="flex flex-col justify-center items-center grow self-stretch text-white">
             <div className="container flex w-full max-w-[1240px] flex-col items-start gap-3">
                 <div id="collection-page-subtitle" className="text-gray-400 mt-2 mb-4 text-base font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">Owned Items ({filteredData.length})</div>
             </div>
