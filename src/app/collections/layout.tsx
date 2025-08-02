@@ -8,10 +8,9 @@ import { LegendInputBox } from "../ui/inputbox";
 import Image from "next/image";
 import { TextButton, IconTextButton } from "../ui/button";
 
-// --- Wagmi Imports ---
+// --- Custom Auth Context (menggantikan wagmi langsung) ---
 import { useAuth } from '../contexts/AuthContext'
 import { parseAbiItem, getEventSelector } from 'viem';
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { useRouter } from "next/router";
 import { useSearchParams } from 'next/navigation';
 
@@ -20,13 +19,10 @@ import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
 import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    // useRouter digunakan untuk mendapatkan parameter dari URL
     const searchParams = useSearchParams();
     const collectionIdFromUrl = searchParams.get('collectionId');
-
     const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
 
-    // --- STATE UNTUK FORM & MODAL "ADD ITEM" ---
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
@@ -37,17 +33,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemSize: "",
         itemProductDetails: "",
     });
-    
-    // --- STATE UNTUK ERROR VALIDASI FORM "ADD ITEM" ---
+
     const [dataAddItemModalisError, setDataAddItemModalisError] = useState({
         itemImage: false, itemName: false, itemSize: false, itemProductDetails: false,
     });
-    
-    // --- STATE UNTUK STATUS PROSES "ADD ITEM" ---
+
     const [isUploadingItem, setIsUploadingItem] = useState(false);
     const [isMinting, setIsMinting] = useState(false);
     const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
-    // --- STATE UNTUK MENYIMPAN DETAIL KOLEKSI YANG DIPILIH ---
     const [selectedCollectionDetails, setSelectedCollectionDetails] = useState<any>(null);
     const [hasMounted, setHasMounted] = useState(false);
 
@@ -57,13 +50,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     ];
     const fileInputAddItemRef = useRef<HTMLInputElement>(null);
 
-    // --- WAGMI HOOKS UNTUK ADD ITEM ---
-    const { address, isConnected } = useAuth();
-    const { data: itemHash, writeContract: writeAddItem, writeContractAsync: writeAddItemAsync, isPending: isPendingAdd, error: writeAddError } = useWriteContract();
-    const { isLoading: isConfirmingAdd, isSuccess: isSuccessAdd, data: addReceipt, error: confirmAddError } = useWaitForTransactionReceipt({ hash: itemHash });
-    
-    // --- WAGMI HOOKS UNTUK MENGAMBIL DATA KOLEKSI ---
-    const { data: collectionData, isLoading: isCollectionLoading, isError: isCollectionError } = useReadContract({
+    // --- Ambil dari useAuth ---
+    const {
+        address,
+        isConnected,
+        useReadContract: readCollection,
+        writeContract: writeAddItem,
+        writeContractAsync: writeAddItemAsync,
+        dataWriteContract: itemHash,
+        writeContractIsPending: isPendingAdd,
+        writeContractError: writeAddError,
+        useWaitForTransactionReceipt
+    } = useAuth();
+
+    const {
+        isLoading: isConfirmingAdd,
+        isSuccess: isSuccessAdd,
+        data: addReceipt,
+        error: confirmAddError
+    } = useWaitForTransactionReceipt({ hash: itemHash });
+
+    // Ambil data koleksi
+    const { data: collectionData, isLoading: isCollectionLoading, isError: isCollectionError } = readCollection({
         address: COLLECTION_MANAGER_ADDRESS,
         abi: COLLECTION_MANAGER_ABI,
         functionName: 'getCollection',
@@ -73,7 +81,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         },
     });
 
-    // Efek untuk memproses data yang diambil dari kontrak
     useEffect(() => {
         if (collectionData) {
             const [creator, name, category, imageUri, itemIds] = collectionData;
@@ -87,24 +94,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }
     }, [collectionData]);
 
-    const uploadFileToIPFS = async (file: File): Promise<string> => { /* ... */ return ""; };
-    const uploadJsonToIPFS = async (jsonData: any): Promise<string> => { /* ... */ return ""; };
+    const uploadFileToIPFS = async (file: File): Promise<string> => { return ""; };
+    const uploadJsonToIPFS = async (jsonData: any): Promise<string> => { return ""; };
 
-    const handleCloseAddItemModal = () => { /* ... */ };
-    const handleContinueModalAddItem = () => { /* ... */ };
-    const handleBackModalAddItem = () => { /* ... */ };
-    const handleSaveAddItemModal = async () => { /* ... */ };
-    const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { /* ... */ };
-    const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => { /* ... */ };
-    const handleEditDisplayClick = () => { /* ... */ };
-    
+    const handleCloseAddItemModal = () => { };
+    const handleContinueModalAddItem = () => { };
+    const handleBackModalAddItem = () => { };
+    const handleSaveAddItemModal = async () => { };
+    const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { };
+    const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => { };
+    const handleEditDisplayClick = () => { };
+
     const isProcessPending = isCollectionLoading || isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
     const displayAddress = hasMounted && address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected";
 
-    // Data props untuk DetailCard
     const detailCardProps = selectedCollectionDetails ? {
         label: selectedCollectionDetails.label,
-        address: displayAddress, // Address yang terhubung
+        address: displayAddress,
         category: selectedCollectionDetails.category,
         labelButton: "ADD ITEM",
         launchedDate: "June 2024",
@@ -112,7 +118,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         netWorth: 0,
         itemsCount: selectedCollectionDetails.itemsCount,
         listedCount: 0,
-        owner: selectedCollectionDetails.address, // Alamat pembuat koleksi
+        owner: selectedCollectionDetails.address,
     } : {
         label: "Select a Collection",
         address: displayAddress,
@@ -126,15 +132,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         owner: "-",
     };
 
-
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col" suppressHydrationWarning>
-            {/* PERBAIKAN: Gunakan spread operator untuk menampilkan props dinamis */}
             <DetailCard {...detailCardProps} />
             <NavButton initialMenuItems={menuData} />
             {children}
-            
-            {/* Tampilkan status proses */}
+
             {isProcessPending && (
                 <div className="text-center mt-4 text-white">
                     {isUploadingItem ? "Uploading image to IPFS..." : (isPendingAdd ? "Waiting for wallet confirmation..." : "Minting NFT...")}
@@ -230,6 +233,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     )
 }
 
-function encodeEventSignature(eventAbi: { readonly name: "ItemAdded"; readonly type: "event"; readonly inputs: readonly [{ readonly type: "uint256"; readonly name: "targetCollectionId"; readonly indexed: true; }, { readonly type: "uint256"; readonly name: "tokenId"; readonly indexed: true; }]; }): `0x${string}` | import("viem").ByteArray {
+function encodeEventSignature(eventAbi: {
+    readonly name: "ItemAdded";
+    readonly type: "event";
+    readonly inputs: readonly [
+        { readonly type: "uint256"; readonly name: "targetCollectionId"; readonly indexed: true; },
+        { readonly type: "uint256"; readonly name: "tokenId"; readonly indexed: true; }
+    ];
+}): `0x${string}` | import("viem").ByteArray {
     throw new Error("Function not implemented.");
 }
