@@ -60,7 +60,7 @@ const HomeSwiper = () => {
                 >
                     {partners.map((partner) => (
                         <SwiperSlide key={partner.id}>
-                            <div className="logoplaceholder flex w-[200px] h-[140px] content-center items-center justify-center">
+                            <div className="logoplaceholder flex w-[200px] h-[40px] content-center items-center justify-center">
                                 <Image
                                     src={partner.src}
                                     alt={partner.alt}
