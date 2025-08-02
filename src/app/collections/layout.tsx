@@ -262,10 +262,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const isProcessPending = isCollectionLoading || isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
     const displayAddress =
-        hasMounted && address
-            ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+        hasMounted
+            ? `${selectedCollectionDetails.address.substring(0, 6)}...${selectedCollectionDetails.address.substring(selectedCollectionDetails.address.length - 4)}`
             : "Wallet Not Connected";
 
+    console.log('ini adalaaah displayAddress', displayAddress);
 
     const detailCardProps = selectedCollectionDetails ? {
         label: selectedCollectionDetails.label,
@@ -277,7 +278,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         netWorth: 0,
         itemsCount: selectedCollectionDetails.itemsCount,
         listedCount: 0,
-        owner: selectedCollectionDetails.address,
+        owner: displayAddress,
     } : {
         label: "Select a Collection",
         address: displayAddress,
