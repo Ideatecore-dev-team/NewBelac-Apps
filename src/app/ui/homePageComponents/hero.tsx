@@ -24,7 +24,7 @@ const ProductCard = ({ title, description }: ProductCardProps) => (
 );
 
 // Menggunakan dynamic import untuk komponen button
-const NormalButtonComponentsNoSSR = dynamic(() => import('../navbarcomponents/normalButtonComponents'), { ssr: false });
+const NormalButtonComponentsNoSSR = dynamic(() => import('../navbarComponents/normalButtonComponents'), { ssr: false });
 
 const Homepage = () => {
     const { status } = useAuth(); // Menggunakan useAuth dari AuthContext
