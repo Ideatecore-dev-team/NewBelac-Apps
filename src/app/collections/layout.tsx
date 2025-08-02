@@ -23,6 +23,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const collectionIdFromUrl = searchParams.get('collectionId');
     const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
 
+    console.log('ini adalah selectedCollectionId', selectedCollectionId)
+
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
@@ -86,7 +88,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         address: COLLECTION_MANAGER_ADDRESS,
         abi: COLLECTION_MANAGER_ABI,
         functionName: 'getCollection',
-        args: [BigInt(selectedCollectionId ?? 0)],
+        args: [BigInt(selectedCollectionId !== null && selectedCollectionId)],
         query: {
             enabled: selectedCollectionId !== null && isConnected,
         },
@@ -227,7 +229,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 address: COLLECTION_MANAGER_ADDRESS,
                 abi: COLLECTION_MANAGER_ABI,
                 functionName: 'addItem',
-                args: [BigInt(0), metadataUri],
+                args: [BigInt(selectedCollectionId !== null && selectedCollectionId), metadataUri],
                 chainId: 4202,
             });
 
