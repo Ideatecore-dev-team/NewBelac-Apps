@@ -180,7 +180,7 @@ export default function Collections() {
                 confirmButtonText="Cancel"
             >
                 <div className="self-stretch justify-start text-Color-White-2/70 text-base font-semibold font-['D-DIN-PRO'] leading-snug">
-                    Are you sure you want to delete this collection? All items will be burned from the holders’ wallets. The collection itself will remain permanently recorded on the blockchain.
+                    Are you sure you want to delete this collection? All Birds will flee from the holders’ wallets. The collection itself will remain permanently recorded on the blockchain.
                 </div>
             </MiniModal>
         </div>

@@ -65,7 +65,7 @@ const HolderPage: React.FC = () => {
         },
         {
             key: 'itemsOwned',
-            header: 'ITEMS OWNED',
+            header: 'BIRDS OWNED',
             cellClassName: 'text-left'
         },
         {
@@ -86,7 +86,7 @@ const HolderPage: React.FC = () => {
         },
         {
             key: 'items',
-            header: 'ITEMS',
+            header: 'BIRDS',
             render: (row) => (
                 <div className="flex -space-x-2 overflow-hidden">
                     {row.items.slice(0, 3).map((item, index) => ( // Tampilkan hingga 3 item

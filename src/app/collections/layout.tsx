@@ -47,7 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [hasMounted, setHasMounted] = useState(false);
 
     const menuData = [
-        { label: 'Items', href: `/collections/items?collectionId=${selectedCollectionId}` },
+        { label: 'Birds', href: `/collections/items?collectionId=${selectedCollectionId}` },
         { label: 'Holder', href: '/collections/holder' },
     ];
     const fileInputAddItemRef = useRef<HTMLInputElement>(null);
@@ -271,7 +271,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         label: selectedCollectionDetails.label,
         address: displayAddress,
         category: selectedCollectionDetails.category,
-        labelButton: "ADD ITEM",
+        labelButton: "ADD BIRD",
         launchedDate: "June 2024",
         onClick: () => setModalAddItem(true),
         netWorth: 0,
@@ -282,7 +282,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         label: "Select a Collection",
         address: displayAddress,
         category: "N/A",
-        labelButton: "ADD ITEM",
+        labelButton: "ADD BIRD",
         launchedDate: "N/A",
         onClick: () => alert("Please select a collection first."),
         netWorth: 0,
@@ -308,11 +308,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </div>
             )}
 
-            {/* --- MODAL ADD ITEM --- */}
+            {/* --- MODAL ADD BIRD --- */}
             <MiniModal
                 isOpen={modalAddItemIsOpen}
                 onClose={handleCloseAddItemModal}
-                title="ADD ITEM"
+                title="ADD BIRD"
                 onConfirm={handleContinueModalAddItem}
                 confirmButtonText="CONTINUE"
                 disableConfirm={!isConnected || isProcessPending}
@@ -359,11 +359,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <MiniModal
                 isOpen={modalAddItem2IsOpen}
                 onClose={handleCloseAddItemModal}
-                title="ADD ITEM"
+                title="ADD BIRD"
                 onConfirm={handleSaveAddItemModal}
                 onCancel={handleBackModalAddItem}
                 cancelButtonText="BACK"
-                confirmButtonText="ADD ITEM"
+                confirmButtonText="ADD BIRD"
                 disableConfirm={isProcessPending}
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
