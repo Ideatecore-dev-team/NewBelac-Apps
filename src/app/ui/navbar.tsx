@@ -2,8 +2,6 @@
 
 import Link from "next/link"
 import { useAuth } from '../contexts/AuthContext'
-import MenusNavbarComponents from './navbarComponents/menusNavbarComponents'
-import NormalButtonComponents from "./navbarComponents/normalButtonComponents"
 import dynamic from "next/dynamic"
 
 import Image from "next/image"
@@ -27,7 +25,7 @@ export default function Navbar() {
                                 alt="logo"
                                 src="/images/Realmark-Logo.png"
                             />
-                            
+
                             {/* <h1 className=" text-[#FFF] text-[16px] font-bold leading-4 tracking-[0.5px]"> REALMARK </h1> */}
                         </Link>
                     </div>
