@@ -8,6 +8,7 @@ import {
     useConnect,
     useDisconnect,
     useSwitchChain,
+    useReadContract,
     useWriteContract,
     useWaitForTransactionReceipt,
 } from "wagmi";
@@ -69,10 +70,12 @@ function useAuthValue() {
         chainId,
         switchChain,
 
+        useReadContract,
         writeContract,
         dataWriteContract,
         writeContractIsPending,
         useWaitForTransactionReceipt,
+
         writeContractError,
         writeContractAsync
     }), [
@@ -88,6 +91,7 @@ function useAuthValue() {
         chainId,
         switchChain,
 
+        useReadContract,
         writeContract,
         dataWriteContract,
         writeContractIsPending,
