@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImagePreview: "/images/placeholder_300x200.png",
+        itemImagePreview: "https://placehold.co/300x200.png",
         itemImage: null as File | null,
         itemName: "",
         itemUniqueTag: "#1",
@@ -63,7 +63,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         useWaitForTransactionReceipt
     } = useAuth();
 
-     // Hook untuk mendapatkan daftar ID koleksi yang dibuat oleh pengguna
+    // Hook untuk mendapatkan daftar ID koleksi yang dibuat oleh pengguna
     const { data: collectionIds, isError: collectionsError, isLoading: collectionsLoading } = readCollection({
         address: COLLECTION_MANAGER_ADDRESS,
         abi: COLLECTION_MANAGER_ABI,
@@ -242,7 +242,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
     };
-  
+
     const handleEditDisplayClick = () => {
         fileInputAddItemRef.current?.click();
     };
@@ -260,11 +260,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const isProcessPending = isCollectionLoading || isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
     const displayAddress =
-    hasMounted && address
-      ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-      : "Wallet Not Connected";
+        hasMounted && address
+            ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+            : "Wallet Not Connected";
 
-    
+
     const detailCardProps = selectedCollectionDetails ? {
         label: selectedCollectionDetails.label,
         address: displayAddress,
