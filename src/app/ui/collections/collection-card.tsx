@@ -76,26 +76,24 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                         <div className="w-[75px] inline-flex flex-col justify-start items-start gap-2">
                             <div className="self-stretch justify-start text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Floor price</div>
                             <div className="inline-flex justify-start items-center gap-[5px]">
-                                <div className="flex items-center justify-start text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">
-                                    {data.price || ""}
-                                    {data.price && (
-                                        <Image
-                                            className="ml-1"
-                                            priority
-                                            height={18}
-                                            width={18}
-                                            src="/icons/IDRX.svg"
-                                            alt="currency-icon"
-                                        />
-                                    )}
-                                </div>
+                                <p className="flex text-[14px] items-center justify-start text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">
+                                    {data.floorPrice || "-"}
+                                </p>
+                                <Image
+                                    // className="pl-1"
+                                    priority
+                                    height={16}
+                                    width={16}
+                                    src="/icons/IDRX.svg"
+                                    alt="currency-icon"
+                                />
                             </div>
                         </div>
                         <div className="w-[68px] inline-flex flex-col justify-start items-start gap-2">
                             <div className="self-stretch justify-start text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Items</div>
-                            <div className="justify-start text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">
+                            <p className="justify-start text-[14px]  text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">
                                 {data.items || "-"}
-                            </div>
+                            </p>
                         </div>
                     </div>
                 </div>
