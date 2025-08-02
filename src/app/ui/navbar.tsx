@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { useAuth } from '../contexts/AuthContext'
-import MenusNavbarComponents from './navbarcomponents/menusNavbarComponents'
-import NormalButtonComponents from "./navbarcomponents/normalButtonComponents"
+import MenusNavbarComponents from './navbarComponents/menusNavbarComponents'
+import NormalButtonComponents from "./navbarComponents/normalButtonComponents"
 import dynamic from "next/dynamic"
 
 import Image from "next/image"
 
-const MenusNavbarComponentsNoSSR = dynamic(() => import('./navbarcomponents/menusNavbarComponents'), { ssr: false })
-const NormalButtonComponentsNoSSR = dynamic(() => import('./navbarcomponents/normalButtonComponents'), { ssr: false })
+const MenusNavbarComponentsNoSSR = dynamic(() => import('./navbarComponents/menusNavbarComponents'), { ssr: false })
+const NormalButtonComponentsNoSSR = dynamic(() => import('./navbarComponents/normalButtonComponents'), { ssr: false })
 
 export default function Navbar() {
     const { status } = useAuth()
