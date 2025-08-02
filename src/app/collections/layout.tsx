@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
-        itemImagePreview: "/images/placeholder_300x200.png",
+        itemImagePreview: "https://placehold.co/300x200.png",
         itemImage: null as File | null,
         itemName: "",
         itemUniqueTag: "#1",
@@ -63,6 +63,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         useWaitForTransactionReceipt
     } = useAuth();
 
+    // Hook untuk mendapatkan daftar ID koleksi yang dibuat oleh pengguna
+    const { data: collectionIds, isError: collectionsError, isLoading: collectionsLoading } = readCollection({
+        address: COLLECTION_MANAGER_ADDRESS,
+        abi: COLLECTION_MANAGER_ABI,
+        functionName: 'getCollectionsByCreator',
+        args: [address as `0x${string}`],
+        query: {
+            enabled: isConnected && !!address,
+        }
+    });
+
     const {
         isLoading: isConfirmingAdd,
         isSuccess: isSuccessAdd,
@@ -94,19 +105,165 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }
     }, [collectionData]);
 
-    const uploadFileToIPFS = async (file: File): Promise<string> => { return ""; };
-    const uploadJsonToIPFS = async (jsonData: any): Promise<string> => { return ""; };
+    const uploadFileToIPFS = async (file: File): Promise<string> => {
+        setIsUploadingItem(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await fetch('/api/upload-image-to-ipfs', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS image upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading image to IPFS:", err);
+            alert(`Failed to upload image to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        } finally {
+            setIsUploadingItem(false);
+        }
+    };
+    const uploadJsonToIPFS = async (jsonData: any): Promise<string> => {
+        try {
+            const response = await fetch('/api/upload-json-to-ipfs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS JSON upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading JSON to IPFS:", err);
+            alert(`Failed to upload metadata to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        }
+    };
 
-    const handleCloseAddItemModal = () => { };
-    const handleContinueModalAddItem = () => { };
-    const handleBackModalAddItem = () => { };
-    const handleSaveAddItemModal = async () => { };
-    const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { };
-    const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => { };
-    const handleEditDisplayClick = () => { };
+    const handleCloseAddItemModal = () => {
+        setModalAddItem(false);
+        setModalAddItem2(false);
+        setDataAddItemModal({
+            itemImagePreview: "https://placehold.co/300x200.png",
+            itemImage: null,
+            itemName: "",
+            itemUniqueTag: "#1",
+            itemSize: "",
+            itemProductDetails: "",
+        });
+        setDataAddItemModalisError({
+            itemImage: false, itemName: false, itemSize: false, itemProductDetails: false,
+        });
+        setMintedTokenId(null);
+    };
+
+    const handleContinueModalAddItem = () => {
+        const newErrors = {
+            itemImage: dataAddItemModal.itemImage === null,
+            itemName: dataAddItemModal.itemName.trim() === "",
+            itemSize: false,
+            itemProductDetails: false,
+        };
+        setDataAddItemModalisError(newErrors);
+
+        const isFormValid = !Object.values(newErrors).some(error => error);
+        if (!isFormValid) {
+            alert("Please fill in item image and name.");
+            return;
+        }
+
+        setModalAddItem(false);
+        setModalAddItem2(true);
+    };
+    const handleBackModalAddItem = () => {
+        setModalAddItem(true);
+        setModalAddItem2(false);
+    };
+    const handleSaveAddItemModal = async () => {
+        const newErrors = {
+            itemImage: dataAddItemModal.itemImage === null,
+            itemName: dataAddItemModal.itemName.trim() === "",
+            itemSize: dataAddItemModal.itemSize.trim() === "",
+            itemProductDetails: dataAddItemModal.itemProductDetails.trim() === "",
+        };
+        setDataAddItemModalisError(newErrors);
+
+        const isFormValid = !Object.values(newErrors).some(error => error);
+        if (!isFormValid) {
+            alert("Please fill all required fields.");
+            return;
+        }
+        if (!isConnected) {
+            alert("Please connect your wallet first.");
+            return;
+        }
+
+        setIsMinting(true);
+        setModalAddItem2(false);
+
+        try {
+            const imageUri = await uploadFileToIPFS(dataAddItemModal.itemImage as File);
+            if (!imageUri) throw new Error("Failed to upload image.");
+
+            const metadata = {
+                name: dataAddItemModal.itemName,
+                description: dataAddItemModal.itemProductDetails,
+                image: imageUri,
+                attributes: [{ trait_type: "Size", value: dataAddItemModal.itemSize }],
+            };
+            const metadataUri = await uploadJsonToIPFS(metadata);
+            if (!metadataUri) throw new Error("Failed to upload metadata.");
+
+            // Panggil kontrak addItem
+            await writeAddItemAsync({
+                address: COLLECTION_MANAGER_ADDRESS,
+                abi: COLLECTION_MANAGER_ABI,
+                functionName: 'addItem',
+                args: [BigInt(0), metadataUri],
+                chainId: 4202,
+            });
+
+        } catch (err) {
+            console.error("Error minting item:", err);
+            alert(`An error occurred during minting: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+            setIsMinting(false);
+        }
+    };
+
+    const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
+    };
+
+    const handleEditDisplayClick = () => {
+        fileInputAddItemRef.current?.click();
+    };
+
+    const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setDataAddItemModal({ ...dataAddItemModal, itemImage: file, itemImagePreview: URL.createObjectURL(file) });
+        }
+    };
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     const isProcessPending = isCollectionLoading || isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
-    const displayAddress = hasMounted && address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Wallet Not Connected";
+    const displayAddress =
+        hasMounted && address
+            ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+            : "Wallet Not Connected";
+
 
     const detailCardProps = selectedCollectionDetails ? {
         label: selectedCollectionDetails.label,

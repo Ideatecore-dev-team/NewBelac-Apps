@@ -18,7 +18,7 @@ interface DetailCardProps extends BaseButtonProps {
     labelButton: string,
     avaImage?: string,
     label?: string,
-    address?: string,
+    displayAddress?: string,
     launchedDate?: string,
     category?: string,
     floorPrice?: number,
@@ -33,7 +33,7 @@ const DetailCard: React.FC<DetailCardProps> = ({
     labelButton,
     avaImage,
     label = "...",
-    address,
+    displayAddress,
     launchedDate,
     category,
     floorPrice,
@@ -60,7 +60,7 @@ const DetailCard: React.FC<DetailCardProps> = ({
                                 alt="copy"
                                 size="S"
                                 withoutOutline
-                                onClick={() => navigator.clipboard.writeText(address || label)}
+                                onClick={() => navigator.clipboard.writeText(displayAddress || label)}
                             />
                             {
                                 floorPrice !== undefined && (
