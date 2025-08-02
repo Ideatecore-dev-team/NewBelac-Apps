@@ -71,7 +71,7 @@ function useAuthValue() {
         isConnected,
         chainId,
         switchChain,
-        
+
         useReadContracts,
         useReadContract,
         writeContract,
@@ -79,7 +79,8 @@ function useAuthValue() {
         writeContractIsPending,
         useWaitForTransactionReceipt,
         writeContractError,
-        writeContractAsync
+        writeContractAsync,
+        lastPath
     }), [
         address,
         status,
@@ -100,7 +101,8 @@ function useAuthValue() {
         writeContractIsPending,
         useWaitForTransactionReceipt,
         writeContractError,
-        writeContractAsync
+        writeContractAsync,
+        lastPath
     ]);
 }
 type AuthContextType = ReturnType<typeof useAuthValue>;

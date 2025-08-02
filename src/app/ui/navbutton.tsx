@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
 type MenuItem = {
     href: string;
@@ -11,20 +12,22 @@ type MenuItem = {
 };
 
 export default function MenuButton({ initialMenuItems }: { initialMenuItems: MenuItem[] }) {
-    const pathname = usePathname();
+    const { lastPath } = useAuth();
 
     const [menuItems] = useState(initialMenuItems || []);
     const [activeItem, setActiveItem] = useState('');
 
+
     useEffect(() => {
         // Sekarang TypeScript tahu bahwa 'item' adalah sebuah MenuItem. Error hilang.
-        const foundActive = menuItems.find(item => item.href === pathname);
+        const foundActive = menuItems.find(item => item.href === lastPath);
+        console.log('ini pathname', lastPath)
         if (foundActive) {
             setActiveItem(foundActive.href);
         } else {
             setActiveItem('');
         }
-    }, [pathname, menuItems]);
+    }, [lastPath, menuItems]);
 
     return (
         <div className="flex py-2">
