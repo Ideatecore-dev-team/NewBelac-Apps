@@ -11,7 +11,7 @@ export default function CustomButtonComponent() {
             {({ isConnected, openConnectModal}) => {
                 if (isConnected) {
                     return (
-                        <h1>
+                        <h1 className='h-12'>
                             CONNECTED
                         </h1>
                     );
