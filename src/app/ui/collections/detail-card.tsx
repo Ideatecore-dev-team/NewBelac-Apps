@@ -1,6 +1,18 @@
+import React from "react"
 import Image from "next/image"
 import { IconButton, IconTextButton } from "../button"
+import Link from "next/link"
 import { BaseButtonProps } from "../button/baseButton"
+
+// Fungsi helper untuk mengonversi URI IPFS ke URL HTTP
+const resolveIpfsUrl = (ipfsUri: string): string => {
+    if (!ipfsUri || !ipfsUri.startsWith('ipfs://')) {
+        return "https://placehold.co/56x56.png"; // Placeholder default
+    }
+    const ipfsGatewayUrl = 'https://ipfs.io/ipfs/'; // Atau gateway Pinata Anda
+    const cid = ipfsUri.replace('ipfs://', '');
+    return `${ipfsGatewayUrl}${cid}`;
+};
 
 interface DetailCardProps extends BaseButtonProps {
     labelButton: string,
@@ -19,7 +31,7 @@ interface DetailCardProps extends BaseButtonProps {
 const DetailCard: React.FC<DetailCardProps> = ({
     onClick = () => ({}),
     labelButton,
-    avaImage = "https://placehold.co/56x56.png",
+    avaImage,
     label = "...",
     address,
     launchedDate,
@@ -30,10 +42,14 @@ const DetailCard: React.FC<DetailCardProps> = ({
     listedCount,
     owner
 }) => {
+    // Menggunakan fungsi helper untuk mendapatkan URL gambar yang valid
+    const avatarUrl = resolveIpfsUrl(avaImage || "");
+
     return (
         <div id="detail-card-container" className="w-[1240px] p-4 bg-[#1C1C1C] rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex justify-start items-center gap-8">
             <div id="detail-card-wrapper-left" className="flex-1 flex justify-start items-center gap-4">
-                <img className="w-14 h-14 relative rounded-full border border-Color-Grey-1" src={avaImage} />
+                {/* PERBAIKAN: Menggunakan URL IPFS yang dikonversi */}
+                <img className="w-14 h-14 relative rounded-full border border-Color-Grey-1" src={avatarUrl} alt="collection-avatar" />
                 <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-1.5">
                     <div className="self-stretch inline-flex justify-start items-center gap-4">
                         <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-tight tracking-wide">{label}</div>
@@ -61,10 +77,10 @@ const DetailCard: React.FC<DetailCardProps> = ({
                     </div>
                     <div className="inline-flex justify-start items-start gap-3">
                         {
-                            address && (
+                            owner && ( // PERBAIKAN: Gunakan prop `owner` untuk menampilkan alamat
                                 <div className="flex justify-start items-center gap-3">
                                     <div className="px-2 py-1 bg-[#1C1C1C] rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
-                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">BY </span><span className="text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{address}</span></div>
+                                        <div className="justify-start"><span className="text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">BY </span><span className="text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{owner}</span></div>
                                     </div>
                                 </div>
                             )
