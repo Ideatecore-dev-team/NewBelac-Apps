@@ -213,6 +213,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col" suppressHydrationWarning>
             <DetailCard
                 label={displayAddress}
+                address={address}
                 labelButton="CREATE COLLECTION"
                 launchedDate="June 2024"
                 onClick={() => setModalAddCollection(true)}

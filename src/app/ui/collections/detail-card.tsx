@@ -18,7 +18,7 @@ interface DetailCardProps extends BaseButtonProps {
     labelButton: string,
     avaImage?: string,
     label?: string,
-    displayAddress?: string,
+    address?: string,
     launchedDate?: string,
     category?: string,
     floorPrice?: number,
@@ -33,7 +33,7 @@ const DetailCard: React.FC<DetailCardProps> = ({
     labelButton,
     avaImage,
     label = "...",
-    displayAddress,
+    address,
     launchedDate,
     category,
     floorPrice,
@@ -44,6 +44,9 @@ const DetailCard: React.FC<DetailCardProps> = ({
 }) => {
     // Menggunakan fungsi helper untuk mendapatkan URL gambar yang valid
     const avatarUrl = resolveIpfsUrl(avaImage || "");
+
+    console.log('label', label)
+    console.log('address', address)
 
     return (
         <div id="detail-card-container" className="w-[1240px] p-4 bg-[#1C1C1C] rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex justify-start items-center gap-8">
@@ -60,7 +63,7 @@ const DetailCard: React.FC<DetailCardProps> = ({
                                 alt="copy"
                                 size="S"
                                 withoutOutline
-                                onClick={() => navigator.clipboard.writeText(displayAddress || label)}
+                                onClick={() => navigator.clipboard.writeText(address || label)}
                             />
                             {
                                 floorPrice !== undefined && (
