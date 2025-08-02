@@ -23,7 +23,7 @@ export default function Navbar() {
                                 width={127}
                                 height={20}
                                 alt="logo"
-                                src="/images/Realmark-Logo.png"
+                                src="/icons/KeeChain.svg"
                             />
 
                             {/* <h1 className=" text-[#FFF] text-[16px] font-bold leading-4 tracking-[0.5px]"> REALMARK </h1> */}
