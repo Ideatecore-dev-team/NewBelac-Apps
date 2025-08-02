@@ -9,6 +9,7 @@ import {
     useDisconnect,
     useSwitchChain,
     useReadContract,
+    useReadContracts,
     useWriteContract,
     useWaitForTransactionReceipt,
 } from "wagmi";
@@ -69,7 +70,8 @@ function useAuthValue() {
         isConnected,
         chainId,
         switchChain,
-
+        
+        useReadContracts,
         useReadContract,
         writeContract,
         dataWriteContract,
@@ -91,6 +93,7 @@ function useAuthValue() {
         chainId,
         switchChain,
 
+        useReadContracts,
         useReadContract,
         writeContract,
         dataWriteContract,
