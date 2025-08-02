@@ -7,6 +7,10 @@ import { useEffect } from 'react';
 import { useConnectModal } from '@xellar/kit';
 
 import Hero from './ui/homePageComponents/hero'
+import About from './ui/homePageComponents/about'
+import HomeSwiper from './ui/homePageComponents/homeSwiper'
+
+
 
 export default function page() {
   const { isConnected, connectors, address } = useAuth();
@@ -27,7 +31,11 @@ export default function page() {
     <div className="relative w-full h-full">
       {
         !address && (
-          <Hero />
+          <>
+            <Hero />
+            <About />
+            {/* <HomeSwiper /> */}
+          </>
         )
       }
     </div>

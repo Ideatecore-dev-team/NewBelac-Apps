@@ -58,3 +58,7 @@ body {
     }
   }
 }
+
+.swiper-wrapper { /* biar continous */
+transition-timing-function: linear !important;
+}
