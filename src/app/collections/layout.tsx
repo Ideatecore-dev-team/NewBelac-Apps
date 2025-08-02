@@ -23,8 +23,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const collectionIdFromUrl = searchParams.get('collectionId');
     const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
 
-    console.log('ini adalah selectedCollectionId', selectedCollectionId)
-
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
@@ -262,7 +260,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const isProcessPending = isCollectionLoading || isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
     const displayAddress =
-        hasMounted
+        hasMounted && selectedCollectionDetails
             ? `${selectedCollectionDetails.address.substring(0, 6)}...${selectedCollectionDetails.address.substring(selectedCollectionDetails.address.length - 4)}`
             : "Wallet Not Connected";
 
@@ -270,7 +268,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const detailCardProps = selectedCollectionDetails ? {
         label: selectedCollectionDetails.label,
-        address: displayAddress,
+        address: selectedCollectionDetails.address,
         category: selectedCollectionDetails.category,
         labelButton: "ADD BIRD",
         launchedDate: "June 2024",

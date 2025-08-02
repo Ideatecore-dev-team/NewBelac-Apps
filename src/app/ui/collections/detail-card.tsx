@@ -45,9 +45,6 @@ const DetailCard: React.FC<DetailCardProps> = ({
     // Menggunakan fungsi helper untuk mendapatkan URL gambar yang valid
     const avatarUrl = resolveIpfsUrl(avaImage || "");
 
-    console.log('label', label)
-    console.log('address', address)
-
     return (
         <div id="detail-card-container" className="w-[1240px] p-4 bg-[#1C1C1C] rounded-md outline outline-offset-[-1px] outline-[#2C2C2C] inline-flex justify-start items-center gap-8">
             <div id="detail-card-wrapper-left" className="flex-1 flex justify-start items-center gap-4">
