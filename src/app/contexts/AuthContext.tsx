@@ -12,7 +12,7 @@ import {
     useWriteContract,
     useWaitForTransactionReceipt,
 } from "wagmi";
-import { redirect, usePathname, useRouter } from 'next/navigation';
+import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { LSK_TOKEN_ADDRESS } from "@/constants";
 
@@ -25,10 +25,11 @@ function useAuthValue() {
     const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync } = useWriteContract();
 
     const router = useRouter();
+    const searchParams = useSearchParams();
     const pathName = usePathname();
 
+    var lastPath = `${pathName}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
     useEffect(() => {
-        var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
         if (!isConnected && pathName !== "/") {
             redirect('/')
         } else if (isConnected) {
@@ -38,7 +39,7 @@ function useAuthValue() {
 
     useEffect(() => {
         if (pathName !== "/") {
-            localStorage.setItem('lastPath', pathName);
+            localStorage.setItem('lastPath', lastPath);
         }
     }, [pathName])
 
@@ -75,7 +76,6 @@ function useAuthValue() {
         dataWriteContract,
         writeContractIsPending,
         useWaitForTransactionReceipt,
-
         writeContractError,
         writeContractAsync
     }), [
