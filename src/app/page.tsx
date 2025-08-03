@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import Hero from './ui/homePageComponents/hero'
 import About from './ui/homePageComponents/about'
 import HomeSwiper from './ui/homePageComponents/homeSwiper'
+import HowItWorksSection from './ui/homePageComponents/howItWorks';
 
 
 
@@ -32,6 +33,7 @@ export default function page() {
           <>
             <Hero />
             <About />
+            <HowItWorksSection />
             {/* <HomeSwiper /> */}
           </>
         )
