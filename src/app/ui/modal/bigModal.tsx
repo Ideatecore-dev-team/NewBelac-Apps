@@ -29,7 +29,7 @@ interface ModalProps {
     bgColour?: string;
 }
 
-const MiniModal: React.FC<ModalProps> = ({
+const BigModal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
     onCancel,
@@ -104,7 +104,7 @@ const MiniModal: React.FC<ModalProps> = ({
                 aria-hidden="true"
             ></div>
 
-            {/* MiniModal Content */}
+            {/* BigModal Content */}
             <div
                 ref={modalRef}
                 className={`relative rounded-xl w-auto mx-auto max-w-6xl min-w-6xl p-4 shadow-lg ${bgColour} focus:outline-[#2C2C2C] focus:outline transform transition-all`}
@@ -293,4 +293,4 @@ const MiniModal: React.FC<ModalProps> = ({
     );
 };
 
-export default MiniModal;
+export default BigModal;
