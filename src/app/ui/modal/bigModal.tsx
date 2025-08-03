@@ -20,11 +20,19 @@ interface ModalProps {
     itemSize: string;
     itemProductDetails?: string;
 
+    //properti burung
+    isListed: boolean; // Properti baru untuk status listing
+    itemBirth?: string; // Nilai dari trait_type 'Birth'
+    itemBirdType?: string; // Nilai dari trait_type 'BirdType'
+    itemKeeDuration?: string; // Nilai dari trait_type 'KeeDuration'
+    itemBestAchievement?: string; // Nilai dari trait_type 'BestAchievement'
+    itemAudioUri?: string; // Properti audio
+
     // Props opsional untuk tombol
-    onCancel?: () => void; // Fungsi yang dipanggil saat tombol Cancel diklik
-    onConfirm?: () => void; // Fungsi yang dipanggil saat tombol Confirm diklik
-    cancelButtonText?: string; // Teks untuk tombol Cancel, default 'Cancel'
-    confirmButtonText?: string; // Teks untuk tombol Confirm, default 'Confirm'
+    onCancel?: () => void; 
+    onConfirm?: () => void; 
+    cancelButtonText?: string; 
+    confirmButtonText?: string;
     icon?: string
     bgColour?: string;
 }
@@ -46,6 +54,14 @@ const BigModal: React.FC<ModalProps> = ({
     itemUniqueTag,
     itemSize,
     itemProductDetails,
+
+    //burung
+    isListed,
+    itemBirth,
+    itemBirdType,
+    itemKeeDuration,
+    itemBestAchievement,
+    itemAudioUri,
 
     cancelButtonText = 'Batal', // Default text
     confirmButtonText = 'Konfirmasi', // Default text
@@ -178,6 +194,7 @@ const BigModal: React.FC<ModalProps> = ({
                             </div>
                         </div>
                         <div className="self-stretch px-4 py-3 bg-Color-Grey-2 rounded-md outline-[#2C2C2C] outline-offset-[-1px] outline-Color-Grey-1 flex flex-col justify-start items-center gap-4">
+
                             <div className="self-stretch inline-flex justify-between items-start">
                                 <div className="inline-flex flex-col justify-start items-start gap-3">
                                     <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Price</div>
@@ -211,6 +228,24 @@ const BigModal: React.FC<ModalProps> = ({
                                     <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-tight tracking-wide">THIS PRODUCT IS NOT LISTED</div>
                                 </div>
                             </div>
+
+                            {/* BURUNG prop isListed */}
+                            {isListed ? (
+                                // Tampilkan tombol konfirmasi jika produk terdaftar
+                                <div data-property-1="Outline" data-property-2="L" className="self-stretch h-14 p-4 bg-Color-Grey-1 rounded-md ...">
+                                    <button onClick={onConfirm} className="text-Color-White-1 text-xl font-semibold ...">
+                                        {confirmButtonText}
+                                    </button>
+                                </div>
+                            ) : (
+                                // Tampilkan notifikasi jika produk tidak terdaftar
+                                <div data-icon-left="false" data-icon-right="false" data-notification="false" data-property-1="Outline" data-property-2="L" data-property-3="Disabled" data-sep-left="false" data-sep-right="false" data-text="true" className="self-stretch h-14 p-4 bg-Color-Grey-1 rounded-md ...">
+                                    <div className="flex justify-center items-center gap-2.5">
+                                        <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-tight tracking-wide">THIS PRODUCT IS NOT LISTED</div>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                         <div className="self-stretch flex flex-col justify-start items-start gap-4">
                             <div className="self-stretch inline-flex justify-start items-center gap-4">
@@ -256,6 +291,62 @@ const BigModal: React.FC<ModalProps> = ({
                                         <>
                                             <div className="self-stretch inline-flex flex-col justify-start items-start gap-3">
                                                 <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] leading-3 tracking-wide">Product Details</div>
+                                                {/* Menggunakan itemProductDetails dari props */}
+                                                <div className="self-stretch justify-start">
+                                                    <p className="text-sm font-semibold font-['D-DIN-PRO'] leading-none tracking-wide">
+                                                        {itemProductDetails || 'No product details available.'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Menampilkan Attributes baru */}
+                                            <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                                                <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] leading-3 tracking-wide">Attributes</div>
+                                                <div className="grid grid-cols-2 gap-3 self-stretch">
+                                                    {/* Tampilkan Birth */}
+                                                    {itemBirth && (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-Color-White-2/70 text-xs font-semibold">Birth</span>
+                                                            <span className="text-Color-White-1 text-sm font-semibold">{itemBirth}</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Tampilkan BirdType */}
+                                                    {itemBirdType && (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-Color-White-2/70 text-xs font-semibold">Bird Type</span>
+                                                            <span className="text-Color-White-1 text-sm font-semibold">{itemBirdType}</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Tampilkan KeeDuration */}
+                                                    {itemKeeDuration && (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-Color-White-2/70 text-xs font-semibold">Kee Duration</span>
+                                                            <span className="text-Color-White-1 text-sm font-semibold">{itemKeeDuration}</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Tampilkan BestAchievement */}
+                                                    {itemBestAchievement && (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-Color-White-2/70 text-xs font-semibold">Best Achievement</span>
+                                                            <span className="text-Color-White-1 text-sm font-semibold">{itemBestAchievement}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Menampilkan Audio bila ada */}
+                                            {itemAudioUri && (
+                                                <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                                                    <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] leading-3 tracking-wide">Audio</div>
+                                                    <audio controls src={itemAudioUri} className="w-full">
+                                                        Your browser does not support the audio element.
+                                                    </audio>
+                                                </div>
+                                            )}
+
+                                            {/* ini dari versi sebelumnya */}
+                                            <div className="self-stretch inline-flex flex-col justify-start items-start gap-3">
+                                                <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] leading-3 tracking-wide">Product Details</div>
                                                 <div className="self-stretch justify-start">
                                                     <span className="text-sm font-semibold font-['D-DIN-PRO'] leading-none tracking-wide">
                                                         The Nike Air Max 97 is a classic sneaker known for its sleek, futuristic design and full-length visible Air cushioning. Inspired by Japanese bullet trains, it features a layered, wavy upper and reflective details, offering both style and comfort. A timeless icon in streetwear and sneaker culture.
@@ -279,6 +370,7 @@ const BigModal: React.FC<ModalProps> = ({
                                                     Please consider checking the details with the physic product.
                                                 </div>
                                             </div>
+                                            {/* nah sampai disini masih sebelumnya */}
                                         </>
                                     )
                                 }
@@ -289,6 +381,7 @@ const BigModal: React.FC<ModalProps> = ({
 
             </div>
         </div >,
+
         document.body // Merender modal di dalam body
     );
 };
