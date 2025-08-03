@@ -36,7 +36,13 @@ const Homepage = () => {
         <div className="flex flex-col items-center justify-center lg:min-h-screen text-center lg:pt-0 pt-4 px-4 md:px-8 lg:px-16 w-[312px] lg:w-[1240px] mx-auto relative overflow-hidden">
             {/* Animasi Ikon Burung */}
             <div className="absolute top-0 left-0 lg:size-[50px] size-[20px] z-[-1] animate-fly">
-                <span className="text-[#4CABFF] text-[50px] opacity-50">🕊️</span>
+                <Image
+                        src="/images/Bird.png"
+                        alt="Flying bird"
+                        width={50}
+                        height={50}
+                        className='size-[40px] lg:size-[50px] opacity-50 -rotate-y-180'
+                    />
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight mb-4">

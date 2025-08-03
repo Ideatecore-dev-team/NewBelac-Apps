@@ -39,34 +39,45 @@ const HowItWorksSection = () => {
             stepNumber: 1,
             title: "Connect Your Wallet",
             description: "Securely link your digital wallet to our platform to begin your journey.",
-            iconSrc: "/icons/wallet.svg", // Replace with your actual icon path
+            iconSrc: "/icons/wallet.svg",
             altText: "Connect Wallet Icon"
         },
         {
             stepNumber: 2,
             title: "Add a Collection",
             description: "Create a new collection for your birds or choose an existing one.",
-            iconSrc: "/icons/Collections.svg", // Replace with your actual icon path
+            iconSrc: "/icons/Collections.svg",
             altText: "Add Collection Icon"
         },
         {
             stepNumber: 3,
             title: "Customize Your Bird",
             description: "Fill in the details for your bird, including its unique traits and competition records.",
-            iconSrc: "/images/Bird.png", // Replace with your actual icon path
+            iconSrc: "/images/Bird.png",
             altText: "Customize Bird Icon"
         },
         {
             stepNumber: 4,
             title: "Mint Your NFT",
             description: "Immortalize your champion bird on the blockchain as a unique NFT.",
-            iconSrc: "/icons/NFTicons.svg", // Replace with your actual icon path
+            iconSrc: "/icons/NFTicons.svg",
             altText: "Mint NFT Icon"
         },
     ];
 
     return (
-        <section className="py-20 lg:py-32 w-[312px] lg:w-[1240px] mx-auto text-center px-4 md:px-8">
+        <section className="py-20 lg:py-32 w-[312px] lg:w-[1240px] mx-auto text-center px-4 md:px-8 relative overflow-hidden">
+            {/* Animasi Burung Terbang */}
+            <div className="absolute bottom-[-20px] left-[-20px] lg:bottom-[-50px] lg:left-[-50px] z-[-1] animate-fly-diagonal">
+                <Image
+                    src="/images/Bird.png"
+                    alt="Flying bird"
+                    width={50}
+                    height={50}
+                    className='size-[40px] lg:size-[50px] opacity-50'
+                />
+            </div>
+
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4">
                 How It <span className="text-[#4CABFF]">Works</span>
             </h2>
