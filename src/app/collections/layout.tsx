@@ -296,17 +296,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavButton initialMenuItems={menuData} />
             {children}
 
-            {isProcessPending && (
-                <div className="text-center mt-4 text-white">
-                    {isUploadingItem ? "Uploading image to IPFS..." : (isPendingAdd ? "Waiting for wallet confirmation..." : "Minting NFT...")}
-                </div>
-            )}
-            {mintedTokenId !== null && (
-                <div className="text-center mt-2 text-green-500 font-bold">
-                    <p>Item minted! Token ID: {mintedTokenId}</p>
-                </div>
-            )}
-
             {/* --- MODAL ADD BIRD --- */}
             <MiniModal
                 isOpen={modalAddItemIsOpen}
