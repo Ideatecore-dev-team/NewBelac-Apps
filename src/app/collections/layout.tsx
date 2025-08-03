@@ -30,8 +30,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
+    const [audioIsPlaying, setAudioIsPlaying] = useState(false);
     const [dataAddItemModal, setDataAddItemModal] = useState({
         itemImagePreview: "https://placehold.co/300x200.png",
+        itemAudioURL: "",
         itemImage: null as File | null,
         itemAudio: null as File | null,
         itemIsListed: false,
@@ -45,8 +47,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemProductDetails: "",
     });
 
+    console.log('inilah dataAddItemModal', dataAddItemModal)
+
     const [dataAddItemModalisError, setDataAddItemModalisError] = useState({
-        itemImage: false, itemName: false, itemSize: false, itemProductDetails: false,
+        itemImage: false,
+        itemAudio: false,
+        itemName: false,
+        itemSize: false,
+        itemProductDetails: false,
+        itemKeeDuration: false,
+        itemBirth: false,
+        itemBestAchievement: false,
+        itemType: false,
     });
 
     const [isUploadingItem, setIsUploadingItem] = useState(false);
@@ -59,7 +71,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         { label: 'Birds', href: `/collections/items?collectionId=${selectedCollectionId}` },
         { label: 'Holder', href: '/collections/holder' },
     ];
-    const fileInputAddItemRef = useRef<HTMLInputElement>(null);
+    const fileInputImageAddItemRef = useRef<HTMLInputElement>(null);
+    const fileInputAudioAddItemRef = useRef(null);
+    const audioRef = useRef(null);
 
     // --- Ambil dari useAuth ---
     const {
@@ -116,12 +130,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }
     }, [collectionData]);
 
+    useEffect(() => {
+        if (dataAddItemModal.itemAudio) {
+            const url = URL.createObjectURL(dataAddItemModal.itemAudio);
+            setDataAddItemModal({
+                ...dataAddItemModal, ['itemAudioURL']: url
+            });
+
+            // Cleanup function untuk menghapus URL objek saat komponen unmount atau file berubah
+            return () => {
+                URL.revokeObjectURL(url);
+            };
+        } else {
+            setDataAddItemModal({
+                ...dataAddItemModal, ['itemAudioURL']: ""
+            });
+        }
+    }, [dataAddItemModal.itemAudio]);
+
     const uploadFileToIPFS = async (file: File): Promise<string> => {
         setIsUploadingItem(true);
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await fetch('/api/upload-to-ipfs', {
+            const response = await fetch('/api/upload-image-to-ipfs', {
                 method: 'POST',
                 body: formData,
             });
@@ -164,6 +196,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setModalAddItem2(false);
         setDataAddItemModal({
             itemImagePreview: "https://placehold.co/300x200.png",
+            itemAudioURL: "",
             itemImage: null,
             itemAudio: null,
             itemIsListed: false,
@@ -177,7 +210,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             itemProductDetails: "",
         });
         setDataAddItemModalisError({
-            itemImage: false, itemName: false, itemSize: false, itemProductDetails: false,
+            itemImage: false,
+            itemAudio: false,
+            itemName: false,
+            itemSize: false,
+            itemProductDetails: false,
+            itemKeeDuration: false,
+            itemBirth: false,
+            itemBestAchievement: false,
+            itemType: false,
         });
         setMintedTokenId(null);
     };
@@ -207,9 +248,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleSaveAddItemModal = async () => {
         const newErrors = {
             itemImage: dataAddItemModal.itemImage === null,
+            itemAudio: dataAddItemModal.itemAudio === null,
             itemName: dataAddItemModal.itemName.trim() === "",
-            itemSize: dataAddItemModal.itemSize.trim() === "",
             itemProductDetails: dataAddItemModal.itemProductDetails.trim() === "",
+            itemKeeDuration: dataAddItemModal.itemKeeDuration === 0,
+            itemBirth: dataAddItemModal.itemBirth.trim() === "",
+            itemBestAchievement: dataAddItemModal.itemBestAchievement.trim() === "",
+            itemType: dataAddItemModal.itemType.trim() === "",
         };
         setDataAddItemModalisError(newErrors);
 
@@ -240,10 +285,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 audio: audioUri,
                 attributes: [
                     { trait_type: "Birth", value: dataAddItemModal.itemBirth },
-                    { trait_type: "BirdType", value: dataAddItemModal.itemSize },
-                    { trait_type: "KeeDuration", value: dataAddItemModal.itemSize },
-                    { trait_type: "BestAchievement", value: dataAddItemModal.itemSize },
-                    { trait_type: "KeeDuration", value: dataAddItemModal.itemSize },
+                    { trait_type: "BirdType", value: dataAddItemModal.itemType },
+                    { trait_type: "KeeDuration", value: dataAddItemModal.itemKeeDuration },
+                    { trait_type: "BestAchievement", value: dataAddItemModal.itemBestAchievement },
                 ],
             };
             const metadataUri = await uploadJsonToIPFS(metadata);
@@ -271,7 +315,37 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     const handleEditDisplayClick = () => {
-        fileInputAddItemRef.current?.click();
+        fileInputImageAddItemRef.current?.click();
+    };
+
+    const handleUploadAdioButtonClick = () => {
+        if (fileInputAudioAddItemRef.current) {
+            fileInputAudioAddItemRef.current?.click();
+        }
+    };
+
+    const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            console.log('File audio yang dipilih:', file);
+            // Di sini Anda bisa menambahkan logika untuk memproses file audio
+            // Misalnya, mengunggah ke server, atau memutar di browser
+
+            // Contoh: Tampilkan nama file dan ukurannya
+            // alert(`File dipilih: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+
+            // Contoh: Simpan file ke state untuk diputar nanti
+            setDataAddItemModal({ ...dataAddItemModal, itemAudio: file });
+        }
+    };
+
+    const handleAudiuPlayPause = () => {
+        if (audioIsPlaying) {
+            audioRef.current?.pause();
+        } else {
+            audioRef.current?.play();
+        }
+        setAudioIsPlaying(!audioIsPlaying);
     };
 
     const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -350,7 +424,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         />
                         <input
                             type="file"
-                            ref={fileInputAddItemRef}
+                            ref={fileInputImageAddItemRef}
                             onChange={handleImageAddItemChange}
                             accept="image/png, image/jpeg, image/webp"
                             className="hidden"
@@ -371,6 +445,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         value={dataAddItemModal.itemBirth || Date.now()}
                         onChangeInput={handleChangeAddItemModal('itemBirth')}
                         type="Date"
+                        required={dataAddItemModalisError.itemBirth}
+                        requiredMsg="You must input the birth"
+                    />
+                    <LegendInputBox
+                        legendText="Bird Type"
+                        placeholder="Red Hat Cikurai"
+                        value={dataAddItemModal.itemType}
+                        onChangeInput={handleChangeAddItemModal('itemType')}
+                        required={dataAddItemModalisError.itemType}
+                        requiredMsg="You must input the type"
                     />
                 </div>
             </MiniModal>
@@ -384,8 +468,40 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 confirmButtonText="ADD BIRD"
                 disableConfirm={isProcessPending}
             >
-                <div id="add-item-modal-wrapper" className=" space-y-3">
+                <div id="add-item-modal-wrapper2" className=" space-y-3">
                     <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Bird:</span></div>
+                    <div id="edit-audio-display" className="flex items-center space-x-4">
+                        {
+                            dataAddItemModal.itemAudioURL !== "" && (
+                                <audio
+                                    controls
+                                    ref={audioRef}
+                                    src={dataAddItemModal.itemAudioURL || undefined}
+                                    onPlay={() => setAudioIsPlaying(true)}
+                                    onPause={() => setAudioIsPlaying(false)}
+                                />
+                            )
+                        }
+                        {/* <button onClick={handleAudiuPlayPause}>Play</button> */}
+                        {/* <TextButton
+                            label="play"
+                            onClick={handleAudiuPlayPause}
+                            size="S"
+                        /> */}
+                        <TextButton
+                            label={dataAddItemModal.itemAudioURL !== "" ? "Edit Kee Bird" : "Add Kee Bird"}
+                            onClick={handleUploadAdioButtonClick}
+                            size="S"
+                        />
+                        <input
+                            type="file"
+                            ref={fileInputAudioAddItemRef}
+                            onChange={handleAudioFileChange}
+                            accept="audio/*" // Menerima semua jenis file audio
+                            className="hidden" // Gunakan CSS untuk menyembunyikan
+                            style={{ display: 'none' }} // Alternatif CSS inline
+                        />
+                    </div>
                     {/* <LegendInputBox
                         legendText="Size"
                         placeholder="Shoes Size"
@@ -395,6 +511,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         required={dataAddItemModalisError.itemSize}
                         requiredMsg="You must input the size"
                     /> */}
+                    <LegendInputBox
+                        legendText="Best Achievement"
+                        placeholder="National / Regional / etc"
+                        value={dataAddItemModal.itemBestAchievement}
+                        onChangeInput={handleChangeAddItemModal('itemBestAchievement')}
+                        required={dataAddItemModalisError.itemBestAchievement}
+                        requiredMsg="You must input the best achievement"
+                    />
+                    <LegendInputBox
+                        legendText="Longest Kee Duration (second)"
+                        placeholder="190"
+                        type="number"
+                        value={dataAddItemModal.itemKeeDuration}
+                        onChangeInput={handleChangeAddItemModal('itemKeeDuration')}
+                        required={dataAddItemModalisError.itemKeeDuration}
+                        requiredMsg="You must input the kee duration"
+                    />
                     <LegendInputBox
                         legendText="Product Details"
                         placeholder="Details"
