@@ -51,12 +51,25 @@ body {
 
   @keyframes fly {
     0% {
-      transform: translate(100vw, 100vh) rotate(-30deg);
+      transform: translate(100vw, 100vh) 
     }
     100% {
-      transform: translate(-100vw, -100vh) rotate(-30deg);
+      transform: translate(-100vw, -100vh)
     }
   }
+}
+
+@keyframes fly-diagonal {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(120vw, -120vh);
+  }
+}
+
+.animate-fly-diagonal {
+  animation: fly-diagonal 10s linear infinite;
 }
 
 .swiper-wrapper { /* biar continous */
