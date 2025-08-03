@@ -13,107 +13,62 @@ import {
     useWriteContract,
     useWaitForTransactionReceipt,
 } from "wagmi";
-import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
-
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'; // Hapus 'redirect' dari sini
 import { LSK_TOKEN_ADDRESS } from "@/constants";
-
 
 function useAuthValue() {
     const { address, status, isConnected, chainId, isReconnecting, isDisconnected } = useAccount();
     const { disconnect } = useDisconnect();
-    const { connectors, connect, } = useConnect();
+    const { connectors, connect } = useConnect();
     const { switchChain } = useSwitchChain();
     const { error: writeContractError, data: dataWriteContract, writeContract, isPending: writeContractIsPending, writeContractAsync } = useWriteContract();
 
+    // Hooks yang hanya bisa di client-side
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathName = usePathname();
 
-    var lastPath = `${pathName}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const lastPath = `${pathName}${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+
     useEffect(() => {
         if (!isConnected && pathName !== "/") {
-            redirect('/')
+            router.push('/'); // Menggunakan router.push untuk client-side
         } else if (isConnected) {
-            router.push(lastPath)
+            router.push(lastPath);
         }
-    }, [isConnected])
+    }, [isConnected, pathName, router, lastPath]); // Tambahkan dependensi lengkap
 
     useEffect(() => {
         if (pathName !== "/") {
             localStorage.setItem('lastPath', lastPath);
         }
-    }, [pathName])
+    }, [pathName, lastPath]); // Tambahkan dependensi lengkap
 
-    const {
-        data: nativeBalanceData,
-        isLoading: isNativeLoading
-    } = useBalance({ address });
-
-    const {
-        data: lskBalanceData,
-        isLoading: isLskLoading
-    } = useBalance({
-        address,
-        token: LSK_TOKEN_ADDRESS,
-    });
-
+    // ... sisa kode lainnya
+    const { data: nativeBalanceData, isLoading: isNativeLoading } = useBalance({ address });
+    const { data: lskBalanceData, isLoading: isLskLoading } = useBalance({ address, token: LSK_TOKEN_ADDRESS });
     const isLoading = isNativeLoading || isLskLoading;
 
     return useMemo(() => ({
-        address,
-        status,
-        nativeBalanceData, // ETH
-        lskBalanceData,    // LSK
-        isLoading,
-        disconnect,
-        connectors,
-        connect,
-        isConnected,
-        chainId,
-        switchChain,
-
-        useReadContracts,
-        useReadContract,
-        writeContract,
-        dataWriteContract,
-        writeContractIsPending,
-        useWaitForTransactionReceipt,
-        writeContractError,
-        writeContractAsync,
-        lastPath
+        address, status, nativeBalanceData, lskBalanceData, isLoading, disconnect,
+        connectors, connect, isConnected, chainId, switchChain, useReadContracts,
+        useReadContract, writeContract, dataWriteContract, writeContractIsPending,
+        useWaitForTransactionReceipt, writeContractError, writeContractAsync, lastPath
     }), [
-        address,
-        status,
-        nativeBalanceData,
-        lskBalanceData,
-        isLoading,
-        disconnect,
-        connectors,
-        connect,
-        isConnected,
-        chainId,
-        switchChain,
-
-        useReadContracts,
-        useReadContract,
-        writeContract,
-        dataWriteContract,
-        writeContractIsPending,
-        useWaitForTransactionReceipt,
-        writeContractError,
-        writeContractAsync,
-        lastPath
+        address, status, nativeBalanceData, lskBalanceData, isLoading, disconnect,
+        connectors, connect, isConnected, chainId, switchChain, useReadContracts,
+        useReadContract, writeContract, dataWriteContract, writeContractIsPending,
+        useWaitForTransactionReceipt, writeContractError, writeContractAsync, lastPath
     ]);
 }
-type AuthContextType = ReturnType<typeof useAuthValue>;
 
+type AuthContextType = ReturnType<typeof useAuthValue>;
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const value = useAuthValue();
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
