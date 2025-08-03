@@ -130,20 +130,20 @@ const BigModal: React.FC<ModalProps> = ({
 
                 <div className="rounded-xl w-full inline-flex space-x-6 items-center overflow-hidden">
                     <div className="min-w-[65%] self-stretch inline-flex flex-col justify-start items-start gap-4">
-                        <Image
-                            priority
-                            fill
-                            // sizes="(max-width: 295px)"
-                            src={itemImage}
-                            alt={itemName}
-                            className="self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden"
-                            onError={(e) => {
-                                e.currentTarget.src = `https://placehold.co/295x192/151515/FFF?text=Error`;
-                            }}
-                        />
-                        {/* <div className={`self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden`}>
-                    
-                        </div> */}
+
+                        <div className={`self-stretch h-[466px] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden`}>
+                            <Image
+                                priority
+                                fill
+                                // sizes="(max-width: 295px)"
+                                src={itemImage}
+                                alt={itemName}
+                                className="self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden"
+                                onError={(e) => {
+                                    e.currentTarget.src = `https://placehold.co/295x192/151515/FFF?text=Error`;
+                                }}
+                            />
+                        </div>
 
                         <div className="self-stretch flex flex-col justify-start items-start gap-4">
                             <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] leading-none tracking-wide">Latest product condition</div>
