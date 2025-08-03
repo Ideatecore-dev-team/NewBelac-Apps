@@ -27,7 +27,7 @@ const HomeSwiper = () => {
 
     return (
         <div className="partner flex flex-col mx-auto lg:pb-12 lg:px-0 py-9 px-6 gap-gap10">
-            <div className="partner-container flex flex-col items-center overflow-hidden lg:w-full w-[312px] mx-auto lg:gap-6 gap-4">
+            <div className="partner-container flex flex-col items-center overflow-hidden w-full mx-auto lg:gap-6 gap-4">
                 {/* <h1 className="font-bold lg:text-6xl xs:text-2xl text-center tracking-tight">
                     Our Partner
                 </h1> */}
@@ -45,7 +45,7 @@ const HomeSwiper = () => {
                     className="mySwiper lg:w-[1240px] w-[312px]"
                     breakpoints={{
                         320: {
-                            slidesPerView: 2,
+                            slidesPerView: 1.5,
                             spaceBetween: 0,
                         },
                         768: {
