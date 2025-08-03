@@ -20,7 +20,7 @@ const About = () => {
                         src="/icons/KeeChain.svg"
                         className='size-[200px] lg:size-[350px]'
                     />
-                    <div className='content-container flex flex-col gap-8'>
+                    <div className='content-container flex flex-col gap-8 lg:pb-0 pb-8'>
                         <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight animate-fade-in">
                             Who are we?
                         </h2>
