@@ -12,16 +12,24 @@ import { TextButton, IconTextButton } from "../ui/button";
 import { useAuth } from '../contexts/AuthContext'
 import { parseAbiItem, getEventSelector } from 'viem';
 import { useRouter } from "next/router";
-import { useSearchParams } from 'next/navigation';
+
+// import { useSearchParams } from 'next/navigation';
+import { SearchParamsHandler } from "./SearchParamsHandler";
 
 // --- Import konstanta yang sudah diperbarui ---
 import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
 import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const searchParams = useSearchParams();
-    const collectionIdFromUrl = searchParams.get('collectionId');
-    const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
+    const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null)
+
+    // const searchParams = useSearchParams();
+
+    const handleCollectionIdChange = (id: number | null) => {
+        setSelectedCollectionId(id)
+    }
+    // const collectionIdFromUrl = searchParams.get('collectionId');
+    // const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
 
     const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
     const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
@@ -292,6 +300,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     return (
         <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col" suppressHydrationWarning>
+            <SearchParamsHandler onCollectionIdChange={handleCollectionIdChange} />
+
             <DetailCard {...detailCardProps} />
             <NavButton initialMenuItems={menuData} />
             {children}
