@@ -232,7 +232,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             });
 
         } catch (err) {
-            console.error("Error minting item:", err);
+            console.error("Error minting Bird:", err);
             alert(`An error occurred during minting: ${err instanceof Error ? err.message : String(err)}`);
         } finally {
             setIsMinting(false);
@@ -303,7 +303,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             )}
             {mintedTokenId !== null && (
                 <div className="text-center mt-2 text-green-500 font-bold">
-                    <p>Item minted! Token ID: {mintedTokenId}</p>
+                    <p>Bird minted! Token ID: {mintedTokenId}</p>
                 </div>
             )}
 
@@ -326,7 +326,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             alt="item-image"
                         />
                         <TextButton
-                            label="Edit Item Display"
+                            label="Edit Bird Display"
                             onClick={handleEditDisplayClick}
                             size="S"
                         />
@@ -338,9 +338,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             className="hidden"
                         />
                     </div>
-                    <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">Item display must match with the physical product.</div>
+                    <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">displayed Bird must match with the real one.</div>
                     <LegendInputBox
-                        legendText="Item Name"
+                        legendText="Bird Name"
                         placeholder="Name"
                         value={dataAddItemModal.itemName}
                         onChangeInput={handleChangeAddItemModal('itemName')}
