@@ -21,13 +21,9 @@ import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
 import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    // const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null)
+    const today = new Date().toISOString().split('T')[0];
 
     const searchParams = useSearchParams();
-
-    // const handleCollectionIdChange = (id: number | null) => {
-    //     setSelectedCollectionId(id)
-    // }
 
     const collectionIdFromUrl = searchParams.get('collectionId');
     const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
@@ -41,7 +37,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemIsListed: false,
         itemName: "",
         itemKeeDuration: 0,
-        itemBirth: null as Date | null,
+        itemBirth: today,
         itemBestAchievement: "",
         itemType: "",
         itemUniqueTag: "#1",
@@ -173,7 +169,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             itemIsListed: false,
             itemName: "",
             itemKeeDuration: 0,
-            itemBirth: null as Date | null,
+            itemBirth: today,
             itemBestAchievement: "",
             itemType: "",
             itemUniqueTag: "#1",
@@ -370,10 +366,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         requiredMsg="You must input the name"
                     />
                     <LegendInputBox
-                        legendText="Unique Tags"
-                        placeholder="Tag"
-                        value={dataAddItemModal.itemUniqueTag}
-                        disabled
+                        legendText="Birth Date (DD/MM/YYYY)"
+                        placeholder="Birth"
+                        value={dataAddItemModal.itemBirth || Date.now()}
+                        onChangeInput={handleChangeAddItemModal('itemBirth')}
+                        type="Date"
                     />
                 </div>
             </MiniModal>
@@ -388,7 +385,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 disableConfirm={isProcessPending}
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
-                    <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Shoes:</span></div>
+                    <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Bird:</span></div>
                     {/* <LegendInputBox
                         legendText="Size"
                         placeholder="Shoes Size"
