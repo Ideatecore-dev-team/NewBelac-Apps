@@ -28,7 +28,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [dataAddItemModal, setDataAddItemModal] = useState({
         itemImagePreview: "https://placehold.co/300x200.png",
         itemImage: null as File | null,
+        itemAudio: null as File | null,
+        itemIsListed: false,
         itemName: "",
+        itemKeeDuration: 0,
+        itemBirth: null as Date | null,
+        itemBestAchievement: "",
+        itemType: "",
         itemUniqueTag: "#1",
         itemSize: "",
         itemProductDetails: "",
@@ -110,19 +116,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await fetch('/api/upload-image-to-ipfs', {
+            const response = await fetch('/api/upload-to-ipfs', {
                 method: 'POST',
                 body: formData,
             });
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(`IPFS image upload failed: ${errorData.error || response.statusText}`);
+                throw new Error(`IPFS upload failed: ${errorData.error || response.statusText}`);
             }
             const data = await response.json();
             return data.ipfsUri;
         } catch (err) {
-            console.error("Error uploading image to IPFS:", err);
-            alert(`Failed to upload image to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            console.error("Error uploading to IPFS:", err);
+            alert(`Failed to upload to IPFS: ${err instanceof Error ? err.message : String(err)}`);
             return '';
         } finally {
             setIsUploadingItem(false);
@@ -154,7 +160,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setDataAddItemModal({
             itemImagePreview: "https://placehold.co/300x200.png",
             itemImage: null,
+            itemAudio: null,
+            itemIsListed: false,
             itemName: "",
+            itemKeeDuration: 0,
+            itemBirth: null as Date | null,
+            itemBestAchievement: "",
+            itemType: "",
             itemUniqueTag: "#1",
             itemSize: "",
             itemProductDetails: "",
@@ -211,13 +223,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         try {
             const imageUri = await uploadFileToIPFS(dataAddItemModal.itemImage as File);
+            const audioUri = await uploadFileToIPFS(dataAddItemModal.itemAudio as File);
             if (!imageUri) throw new Error("Failed to upload image.");
+            if (!audioUri) throw new Error("Failed to upload image.");
 
             const metadata = {
                 name: dataAddItemModal.itemName,
                 description: dataAddItemModal.itemProductDetails,
+                isListed: dataAddItemModal.itemIsListed,
                 image: imageUri,
-                attributes: [{ trait_type: "Size", value: dataAddItemModal.itemSize }],
+                audio: audioUri,
+                attributes: [
+                    { trait_type: "Birth", value: dataAddItemModal.itemBirth },
+                    { trait_type: "BirdType", value: dataAddItemModal.itemSize },
+                    { trait_type: "KeeDuration", value: dataAddItemModal.itemSize },
+                    { trait_type: "BestAchievement", value: dataAddItemModal.itemSize },
+                    { trait_type: "KeeDuration", value: dataAddItemModal.itemSize },
+                ],
             };
             const metadataUri = await uploadJsonToIPFS(metadata);
             if (!metadataUri) throw new Error("Failed to upload metadata.");
@@ -356,7 +378,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             >
                 <div id="add-item-modal-wrapper" className=" space-y-3">
                     <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Shoes:</span></div>
-                    <LegendInputBox
+                    {/* <LegendInputBox
                         legendText="Size"
                         placeholder="Shoes Size"
                         type="text"
@@ -364,7 +386,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         onChangeInput={handleChangeAddItemModal('itemSize')}
                         required={dataAddItemModalisError.itemSize}
                         requiredMsg="You must input the size"
-                    />
+                    /> */}
                     <LegendInputBox
                         legendText="Product Details"
                         placeholder="Details"
@@ -378,15 +400,4 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </MiniModal>
         </div >
     )
-}
-
-function encodeEventSignature(eventAbi: {
-    readonly name: "ItemAdded";
-    readonly type: "event";
-    readonly inputs: readonly [
-        { readonly type: "uint256"; readonly name: "targetCollectionId"; readonly indexed: true; },
-        { readonly type: "uint256"; readonly name: "tokenId"; readonly indexed: true; }
-    ];
-}): `0x${string}` | import("viem").ByteArray {
-    throw new Error("Function not implemented.");
-}
+};
