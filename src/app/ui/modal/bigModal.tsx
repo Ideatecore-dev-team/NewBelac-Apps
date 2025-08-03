@@ -29,9 +29,9 @@ interface ModalProps {
     itemAudioUri?: string; // Properti audio
 
     // Props opsional untuk tombol
-    onCancel?: () => void; 
-    onConfirm?: () => void; 
-    cancelButtonText?: string; 
+    onCancel?: () => void;
+    onConfirm?: () => void;
+    cancelButtonText?: string;
     confirmButtonText?: string;
     icon?: string
     bgColour?: string;
@@ -70,7 +70,7 @@ const BigModal: React.FC<ModalProps> = ({
 }) => {
     const [mounted, setMounted] = useState<boolean>(false);
     const modalRef = useRef<HTMLDivElement>(null);
-    const [activeNav, setActiveNav] = useState('condition')
+    const [activeNav, setActiveNav] = useState('details')
 
     useEffect(() => {
         // Efek ini HANYA untuk mengatur fokus saat modal pertama kali terbuka
@@ -130,12 +130,20 @@ const BigModal: React.FC<ModalProps> = ({
 
                 <div className="rounded-xl w-full inline-flex space-x-6 items-center overflow-hidden">
                     <div className="min-w-[65%] self-stretch inline-flex flex-col justify-start items-start gap-4">
-                        <div className={`self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden`}>
-                            {/* item image
-                        item image
-                        item image
-                        item image */}
-                        </div>
+                        <Image
+                            priority
+                            fill
+                            // sizes="(max-width: 295px)"
+                            src={itemImage}
+                            alt={itemName}
+                            className="self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden"
+                            onError={(e) => {
+                                e.currentTarget.src = `https://placehold.co/295x192/151515/FFF?text=Error`;
+                            }}
+                        />
+                        {/* <div className={`self-stretch h-[466px] bg-[url(${itemImage})] bg-cover bg-center bg-clip-border relative bg-gradient-to-b from-white/0 to-black/20 rounded-2xl overflow-hidden`}>
+                    
+                        </div> */}
 
                         <div className="self-stretch flex flex-col justify-start items-start gap-4">
                             <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] leading-none tracking-wide">Latest product condition</div>
@@ -203,10 +211,10 @@ const BigModal: React.FC<ModalProps> = ({
                                     </div>
                                 </div>
                                 <div className="inline-flex flex-col justify-start items-start gap-1.5">
-                                    <div className="w-20 justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Unique tags</div>
+                                    <div className="w-20 justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Best Achievement</div>
                                     <div className="inline-flex justify-start items-center gap-1.5">
                                         <div className="bg-Color-Grey-2 rounded flex justify-center items-center gap-1">
-                                            <div className="justify-start text-blue-400 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemUniqueTag}</div>
+                                            <div className="justify-start text-blue-400 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemBestAchievement}</div>
                                             <IconButton
                                                 icon='/icons/information-circle-outline.svg'
                                                 size='S'
@@ -219,13 +227,8 @@ const BigModal: React.FC<ModalProps> = ({
                                     </div>
                                 </div>
                                 <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="self-stretch text-right justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Size</div>
-                                    <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemSize}</div>
-                                </div>
-                            </div>
-                            <div data-icon-left="false" data-icon-right="false" data-notification="false" data-property-1="Outline" data-property-2="L" data-property-3="Disabled" data-sep-left="false" data-sep-right="false" data-text="true" className="self-stretch h-14 p-4 bg-Color-Grey-1 rounded-md outline-[#2C2C2C] outline-offset-[-1px] outline-Color-Grey-2 inline-flex justify-center items-start gap-4">
-                                <div className="flex justify-center items-center gap-2.5">
-                                    <div className="justify-start text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] uppercase leading-tight tracking-wide">THIS PRODUCT IS NOT LISTED</div>
+                                    <div className="self-stretch text-right justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] uppercase leading-3 tracking-wide">Bird Type</div>
+                                    <div className="self-stretch justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{itemBirdType}</div>
                                 </div>
                             </div>
 
@@ -249,11 +252,11 @@ const BigModal: React.FC<ModalProps> = ({
                         </div>
                         <div className="self-stretch flex flex-col justify-start items-start gap-4">
                             <div className="self-stretch inline-flex justify-start items-center gap-4">
-                                <div onClick={() => setActiveNav('condition')} data-state="Clicked" className={`cursor-pointer h-10 ${activeNav === 'condition' && 'border-b-3 border-blue-500'} flex justify-center items-center`}>
+                                {/* <div onClick={() => setActiveNav('condition')} data-state="Clicked" className={`cursor-pointer h-10 ${activeNav === 'condition' && 'border-b-3 border-blue-500'} flex justify-center items-center`}>
                                     <div className="flex justify-center items-center gap-2.5">
                                         <div className="justify-start text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Condition</div>
                                     </div>
-                                </div>
+                                </div> */}
                                 <div onClick={() => setActiveNav('details')} data-state="Default" className={`cursor-pointer h-10 ${activeNav === 'details' && 'border-b-3 border-blue-500'} flex justify-center items-center`}>
                                     <div className="flex justify-center items-center gap-2.5">
                                         <div className="justify-start text-Color-White-2/70 text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">Details</div>
@@ -261,7 +264,7 @@ const BigModal: React.FC<ModalProps> = ({
                                 </div>
                             </div>
                             <div className="self-stretch flex flex-col justify-start items-start gap-6">
-                                {
+                                {/* {
                                     activeNav === 'condition' && (
                                         <>
                                             <div className="self-stretch flex flex-col justify-start items-start gap-3">
@@ -285,7 +288,7 @@ const BigModal: React.FC<ModalProps> = ({
                                             </div>
                                         </>
                                     )
-                                }
+                                } */}
                                 {
                                     activeNav === 'details' && (
                                         <>
@@ -310,25 +313,11 @@ const BigModal: React.FC<ModalProps> = ({
                                                             <span className="text-Color-White-1 text-sm font-semibold">{itemBirth}</span>
                                                         </div>
                                                     )}
-                                                    {/* Tampilkan BirdType */}
-                                                    {itemBirdType && (
-                                                        <div className="flex flex-col">
-                                                            <span className="text-Color-White-2/70 text-xs font-semibold">Bird Type</span>
-                                                            <span className="text-Color-White-1 text-sm font-semibold">{itemBirdType}</span>
-                                                        </div>
-                                                    )}
                                                     {/* Tampilkan KeeDuration */}
                                                     {itemKeeDuration && (
                                                         <div className="flex flex-col">
                                                             <span className="text-Color-White-2/70 text-xs font-semibold">Kee Duration</span>
                                                             <span className="text-Color-White-1 text-sm font-semibold">{itemKeeDuration}</span>
-                                                        </div>
-                                                    )}
-                                                    {/* Tampilkan BestAchievement */}
-                                                    {itemBestAchievement && (
-                                                        <div className="flex flex-col">
-                                                            <span className="text-Color-White-2/70 text-xs font-semibold">Best Achievement</span>
-                                                            <span className="text-Color-White-1 text-sm font-semibold">{itemBestAchievement}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -345,7 +334,7 @@ const BigModal: React.FC<ModalProps> = ({
                                             )}
 
                                             {/* ini dari versi sebelumnya */}
-                                            <div className="self-stretch inline-flex flex-col justify-start items-start gap-3">
+                                            {/* <div className="self-stretch inline-flex flex-col justify-start items-start gap-3">
                                                 <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] leading-3 tracking-wide">Product Details</div>
                                                 <div className="self-stretch justify-start">
                                                     <span className="text-sm font-semibold font-['D-DIN-PRO'] leading-none tracking-wide">
@@ -369,7 +358,7 @@ const BigModal: React.FC<ModalProps> = ({
                                                 <div className="justify-start text-Color-White-2/70 text-xs font-semibold font-['D-DIN-PRO'] leading-3 tracking-wide">
                                                     Please consider checking the details with the physic product.
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             {/* nah sampai disini masih sebelumnya */}
                                         </>
                                     )

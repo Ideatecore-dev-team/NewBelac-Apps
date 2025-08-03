@@ -39,6 +39,16 @@ const resolveIpfsUrl = (ipfsUri: string): string => {
 export default function Items() {
     const [activeStatus, setActiveStatus] = useState<FilterStatus>('All');
     const [metadataList, setMetadataList] = useState<NftMetadata[]>([]);
+    const [isModalDetailOpen, setIsModalDetailOpen] = useState<boolean>(false);
+    const [dataDetailItemOpen, setDataDetailItemOpen] = useState<object>({
+        name: "",
+        description: "",
+        isListed: false,
+        image: "",
+        audio: "",
+        attributes: [
+        ]
+    })
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [dataCollectionModal, setDataCollectionModal] = useState({
@@ -105,6 +115,8 @@ export default function Items() {
         },
     }));
 
+
+    console.log('cooooooooooo', collectionData)
 
     const { data: tokenUriRawData = [], isLoading: isLoadingCollections, isError: isErrorCollections, error: errorCollections } = useReadContracts({
         contracts: collectionsReadTokenURI,
@@ -182,6 +194,28 @@ export default function Items() {
         return <div>Error: {error}</div>;
     }
 
+    const handleOpenDetailItem = (item) => {
+        setIsModalDetailOpen(true)
+        setDataDetailItemOpen(item)
+    }
+    const handleCloseDetailItemModal = () => {
+        setIsModalDetailOpen(false)
+        setDataDetailItemOpen({})
+    }
+    const getAttributeValue = (attributes, traitType) => {
+        // Pastikan attributes adalah array dan tidak kosong
+        if (!attributes || !Array.isArray(attributes) || attributes.length === 0) {
+            return null;
+        }
+
+        // Gunakan .find() untuk mencari objek yang sesuai
+        const attribute = attributes.find(attr => attr.trait_type === traitType);
+
+        // Kembalikan 'value' jika ditemukan, atau null jika tidak
+        return attribute ? attribute.value : null;
+    };
+
+
     console.log('ini adalah metadataList', metadataList)
 
 
@@ -236,35 +270,51 @@ export default function Items() {
                     tokenUriRawData.length > 0 && (
                         <div className="content-grid flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                             {
-                                // tokenUriRawData.map((item, key) => {
-                                //     const data:ItemCardProps = {
-                                //         id: key
-                                //     }
-                                //     return (
-                                //         <ItemCard key={key} data={data} />
-                                //     )
-                                // })
+                                metadataList
+                                    .filter(atem => atem.audio !== undefined)
+                                    .map((item, key) => {
+                                        console.log('ini item', item)
+                                        return (
+                                            <ItemCard
+                                                onClick={() => handleOpenDetailItem(item)}
+                                                key={key}
+                                                id={key}
+                                                label={item.name || ""}
+                                                price={0}
+                                                items={0}
+                                                filterStatus={'Not Listed'}
+                                                image={resolveIpfsUrl(item.image)}
+                                            />
+                                        )
+                                    }
+                                    )
                             }
                         </div>
                     )
                 }
             </div>
 
-            <BigModal
-                isOpen={false}
-                onClose={() => alert('hai')}
-                collectionImage="string"
-                collectionName="string"
-                collectionSymbol="string"
-                collectionCategory="string"
-                itemImage="string"
-                itemName="string"
-                itemOwner="string"
-                itemPrice={0}
-                itemUniqueTag="string"
-                itemSize="string"
-                itemProductDetails="string"
-            />
+            {
+                collectionData && collectionData.length > 0 && (
+                    <BigModal
+                        isOpen={isModalDetailOpen}
+                        onClose={handleCloseDetailItemModal}
+                        collectionImage={resolveIpfsUrl(collectionData[3])}
+                        collectionName={collectionData[1]}
+                        collectionCategory={collectionData[2]}
+                        itemImage={resolveIpfsUrl(dataDetailItemOpen?.image)}
+                        itemName={dataDetailItemOpen?.name}
+                        itemOwner={`${collectionData[0].substring(0, 6)}...${collectionData[0].substring(collectionData[0].length - 4)}`}
+                        itemPrice={0}
+                        isListed={dataDetailItemOpen?.isListed}
+                        itemBirth={getAttributeValue(dataDetailItemOpen?.attributes, "Birth")}
+                        itemBirdType={getAttributeValue(dataDetailItemOpen?.attributes, "BirdType")}
+                        itemKeeDuration={getAttributeValue(dataDetailItemOpen?.attributes, "KeeDuration")}
+                        itemBestAchievement={getAttributeValue(dataDetailItemOpen?.attributes, "BestAchievement")}
+                        itemAudioUri={resolveIpfsUrl(dataDetailItemOpen?.audio)}
+                    />
+                )
+            }
         </div>
     )
 }

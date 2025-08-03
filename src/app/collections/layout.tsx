@@ -47,8 +47,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         itemProductDetails: "",
     });
 
-    console.log('inilah dataAddItemModal', dataAddItemModal)
-
     const [dataAddItemModalisError, setDataAddItemModalisError] = useState({
         itemImage: false,
         itemAudio: false,
@@ -364,8 +362,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         hasMounted && selectedCollectionDetails
             ? `${selectedCollectionDetails.address.substring(0, 6)}...${selectedCollectionDetails.address.substring(selectedCollectionDetails.address.length - 4)}`
             : "Wallet Not Connected";
-
-    console.log('ini adalaaah displayAddress', displayAddress);
 
     const detailCardProps = selectedCollectionDetails ? {
         label: selectedCollectionDetails.label,
