@@ -251,4 +251,4 @@ export const PRODUCT_NFT_ABI = [
         ],
         "anonymous": false
     }
-];
+] as const;
