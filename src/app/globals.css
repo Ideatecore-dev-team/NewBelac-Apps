@@ -1,10 +1,77 @@
 @import "tailwindcss";
 
+/* 1. Definisi Variabel Warna (Theme) */
 :root {
-  background-color: #151516;
-  color: #ffffff;
+  --bg-main: #151516;
+  --bg-grey-1: #2C2C2C;
+  --bg-grey-2: #1C1C1C;
+  --text-main: #ffffff;
 }
 
-* {
-  border: 1px solid red;
+/* 2. Aplikasi Style Global */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  background-image: url("../../public/images/cover_bg.png");
+  font-family: "D-DIN-PRO", sans-serif; /* Menambahkan font cadangan (fallback) */
+}
+
+/* 3. Utility Classes menggunakan Variabel */
+.bg-Color-Grey-1 {
+  background-color: var(--bg-grey-1);
+}
+
+.bg-Color-Grey-2 {
+  background-color: var(--bg-grey-2);
+}
+
+/* 4. Definisi Font */
+@font-face {
+  font-family: "D-DIN-PRO";
+  src: url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.eot");
+  src: url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/063a9262f6e38b7ec574ef9084478c25.svg#D-DIN-PRO")format("svg");
+}
+
+@theme {
+  --animate-blink: blink 2s infinite;
+  --animate-fly: fly 10s linear infinite; /* Sesuaikan durasi dan timing jika perlu */
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.2;
+    }
+  }
+
+  @keyframes fly {
+    0% {
+      transform: translate(100vw, 100vh) 
+    }
+    100% {
+      transform: translate(-100vw, -100vh)
+    }
+  }
+}
+
+@keyframes fly-diagonal {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(120vw, -120vh);
+  }
+}
+
+.animate-fly-diagonal {
+  animation: fly-diagonal 10s linear infinite;
+}
+
+.swiper-wrapper { /* biar continous */
+transition-timing-function: linear !important;
 }

@@ -1,48 +1,43 @@
 'use client'
+import { useAuth } from '@/app/contexts/AuthContext';
+import BlankPage from "./ui/page/blankPage";
+import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import Hero from './ui/homePageComponents/hero'
+import About from './ui/homePageComponents/about'
+import HomeSwiper from './ui/homePageComponents/homeSwiper'
+import HowItWorksSection from './ui/homePageComponents/howItWorks';
 
-function App() {
-  const account = useAccount()
-  const { connectors, connect, status, error } = useConnect()
-  const { disconnect } = useDisconnect()
+
+
+export default function page() {
+  const { isConnected, connectors, address } = useAuth();
+
+  useEffect(() => {
+    var lastPath = localStorage.getItem('lastPath') || "walletInventory/items";
+    if (isConnected) {
+      redirect(lastPath)
+    }
+  }, [isConnected])
+
+
+  const metaMaskConnector = connectors.find(
+    (connector) => connector.name === "MetaMask"
+  );
 
   return (
-    <>
-      {/* <div>
-        <h2>Account</h2>
-
-        <div>
-          status: {account.status}
-          <br />
-          addresses: {JSON.stringify(account.addresses)}
-          <br />
-          chainId: {account.chainId}
-        </div>
-
-        {account.status === 'connected' && (
-          <button type="button" onClick={() => disconnect()}>
-            Disconnect
-          </button>
-        )}
-      </div>
-
-      <div>
-        <h2>Connect</h2>
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            type="button"
-          >
-            {connector.name}
-          </button>
-        ))}
-        <div>{status}</div>
-        <div>{error?.message}</div>
-      </div> */}
-    </>
+    <div className="relative w-full h-full">
+      {
+        !address && (
+          <>
+            <Hero />
+            <About />
+            <HowItWorksSection />
+            {/* <HomeSwiper /> */}
+          </>
+        )
+      }
+    </div>
   )
 }
-
-export default App

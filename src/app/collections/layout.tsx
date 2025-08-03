@@ -1,0 +1,540 @@
+'use client'
+
+import DetailCard from "../ui/collections/detail-card"
+import NavButton from "../ui/navbutton"
+import MiniModal from "../ui/modal/miniModal";
+import { useState, useRef, useEffect } from "react";
+import { LegendInputBox } from "../ui/inputbox";
+import Image from "next/image";
+import { TextButton, IconTextButton } from "../ui/button";
+
+// --- Custom Auth Context (menggantikan wagmi langsung) ---
+import { useAuth } from '../contexts/AuthContext'
+import { parseAbiItem, getEventSelector } from 'viem';
+import { useRouter } from "next/router";
+
+import { useSearchParams } from 'next/navigation';
+// import { SearchParamsHandler } from "./SearchParamsHandler";
+
+// --- Import konstanta yang sudah diperbarui ---
+import { COLLECTION_MANAGER_ABI } from '../../constants/COLLECTION_MANAGER_ABI';
+import { COLLECTION_MANAGER_ADDRESS, LISK_TESTNET_CHAIN_ID } from '../../constants/index';
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+    const today = new Date().toISOString().split('T')[0];
+
+    const searchParams = useSearchParams();
+
+    const collectionIdFromUrl = searchParams.get('collectionId');
+    const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
+
+    const [modalAddItemIsOpen, setModalAddItem] = useState<boolean>(false);
+    const [modalAddItem2IsOpen, setModalAddItem2] = useState<boolean>(false);
+    const [audioIsPlaying, setAudioIsPlaying] = useState(false);
+    const [dataAddItemModal, setDataAddItemModal] = useState({
+        itemImagePreview: "https://placehold.co/300x200.png",
+        itemAudioURL: "",
+        itemImage: null as File | null,
+        itemAudio: null as File | null,
+        itemIsListed: false,
+        itemName: "",
+        itemKeeDuration: 0,
+        itemBirth: today,
+        itemBestAchievement: "",
+        itemType: "",
+        itemUniqueTag: "#1",
+        itemSize: "",
+        itemProductDetails: "",
+    });
+
+    const [dataAddItemModalisError, setDataAddItemModalisError] = useState({
+        itemImage: false,
+        itemAudio: false,
+        itemName: false,
+        itemSize: false,
+        itemProductDetails: false,
+        itemKeeDuration: false,
+        itemBirth: false,
+        itemBestAchievement: false,
+        itemType: false,
+    });
+
+    const [isUploadingItem, setIsUploadingItem] = useState(false);
+    const [isMinting, setIsMinting] = useState(false);
+    const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
+    const [selectedCollectionDetails, setSelectedCollectionDetails] = useState<any>(null);
+    const [hasMounted, setHasMounted] = useState(false);
+
+    const menuData = [
+        { label: 'Birds', href: `/collections/items?collectionId=${selectedCollectionId}` },
+        { label: 'Holder', href: '/collections/holder' },
+    ];
+    const fileInputImageAddItemRef = useRef<HTMLInputElement>(null);
+    const fileInputAudioAddItemRef = useRef(null);
+    const audioRef = useRef(null);
+
+    // --- Ambil dari useAuth ---
+    const {
+        address,
+        isConnected,
+        useReadContract: readCollection,
+        writeContract: writeAddItem,
+        writeContractAsync: writeAddItemAsync,
+        dataWriteContract: itemHash,
+        writeContractIsPending: isPendingAdd,
+        writeContractError: writeAddError,
+        useWaitForTransactionReceipt
+    } = useAuth();
+
+    // Hook untuk mendapatkan daftar ID koleksi yang dibuat oleh pengguna
+    const { data: collectionIds, isError: collectionsError, isLoading: collectionsLoading } = readCollection({
+        address: COLLECTION_MANAGER_ADDRESS,
+        abi: COLLECTION_MANAGER_ABI,
+        functionName: 'getCollectionsByCreator',
+        args: [address as `0x${string}`],
+        query: {
+            enabled: isConnected && !!address,
+        }
+    });
+
+    const {
+        isLoading: isConfirmingAdd,
+        isSuccess: isSuccessAdd,
+        data: addReceipt,
+        error: confirmAddError
+    } = useWaitForTransactionReceipt({ hash: itemHash });
+
+    // Ambil data koleksi
+    const { data: collectionData, isLoading: isCollectionLoading, isError: isCollectionError } = readCollection({
+        address: COLLECTION_MANAGER_ADDRESS,
+        abi: COLLECTION_MANAGER_ABI,
+        functionName: 'getCollection',
+        args: [BigInt(selectedCollectionId !== null && selectedCollectionId)],
+        query: {
+            enabled: selectedCollectionId !== null && isConnected,
+        },
+    });
+
+    useEffect(() => {
+        if (collectionData) {
+            const [creator, name, category, imageUri, itemIds] = collectionData;
+            setSelectedCollectionDetails({
+                label: name,
+                address: creator,
+                category: category,
+                imageUri: imageUri,
+                itemsCount: itemIds.length,
+            });
+        }
+    }, [collectionData]);
+
+    useEffect(() => {
+        if (dataAddItemModal.itemAudio) {
+            const url = URL.createObjectURL(dataAddItemModal.itemAudio);
+            setDataAddItemModal({
+                ...dataAddItemModal, ['itemAudioURL']: url
+            });
+
+            // Cleanup function untuk menghapus URL objek saat komponen unmount atau file berubah
+            return () => {
+                URL.revokeObjectURL(url);
+            };
+        } else {
+            setDataAddItemModal({
+                ...dataAddItemModal, ['itemAudioURL']: ""
+            });
+        }
+    }, [dataAddItemModal.itemAudio]);
+
+    const uploadFileToIPFS = async (file: File): Promise<string> => {
+        setIsUploadingItem(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await fetch('/api/upload-image-to-ipfs', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading to IPFS:", err);
+            alert(`Failed to upload to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        } finally {
+            setIsUploadingItem(false);
+        }
+    };
+    const uploadJsonToIPFS = async (jsonData: any): Promise<string> => {
+        try {
+            const response = await fetch('/api/upload-json-to-ipfs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`IPFS JSON upload failed: ${errorData.error || response.statusText}`);
+            }
+            const data = await response.json();
+            return data.ipfsUri;
+        } catch (err) {
+            console.error("Error uploading JSON to IPFS:", err);
+            alert(`Failed to upload metadata to IPFS: ${err instanceof Error ? err.message : String(err)}`);
+            return '';
+        }
+    };
+
+    const handleCloseAddItemModal = () => {
+        setModalAddItem(false);
+        setModalAddItem2(false);
+        setDataAddItemModal({
+            itemImagePreview: "https://placehold.co/300x200.png",
+            itemAudioURL: "",
+            itemImage: null,
+            itemAudio: null,
+            itemIsListed: false,
+            itemName: "",
+            itemKeeDuration: 0,
+            itemBirth: today,
+            itemBestAchievement: "",
+            itemType: "",
+            itemUniqueTag: "#1",
+            itemSize: "",
+            itemProductDetails: "",
+        });
+        setDataAddItemModalisError({
+            itemImage: false,
+            itemAudio: false,
+            itemName: false,
+            itemSize: false,
+            itemProductDetails: false,
+            itemKeeDuration: false,
+            itemBirth: false,
+            itemBestAchievement: false,
+            itemType: false,
+        });
+        setMintedTokenId(null);
+    };
+
+    const handleContinueModalAddItem = () => {
+        const newErrors = {
+            itemImage: dataAddItemModal.itemImage === null,
+            itemName: dataAddItemModal.itemName.trim() === "",
+            itemSize: false,
+            itemProductDetails: false,
+        };
+        setDataAddItemModalisError(newErrors);
+
+        const isFormValid = !Object.values(newErrors).some(error => error);
+        if (!isFormValid) {
+            alert("Please fill in item image and name.");
+            return;
+        }
+
+        setModalAddItem(false);
+        setModalAddItem2(true);
+    };
+    const handleBackModalAddItem = () => {
+        setModalAddItem(true);
+        setModalAddItem2(false);
+    };
+    const handleSaveAddItemModal = async () => {
+        const newErrors = {
+            itemImage: dataAddItemModal.itemImage === null,
+            itemAudio: dataAddItemModal.itemAudio === null,
+            itemName: dataAddItemModal.itemName.trim() === "",
+            itemProductDetails: dataAddItemModal.itemProductDetails.trim() === "",
+            itemKeeDuration: dataAddItemModal.itemKeeDuration === 0,
+            itemBirth: dataAddItemModal.itemBirth.trim() === "",
+            itemBestAchievement: dataAddItemModal.itemBestAchievement.trim() === "",
+            itemType: dataAddItemModal.itemType.trim() === "",
+        };
+        setDataAddItemModalisError(newErrors);
+
+        const isFormValid = !Object.values(newErrors).some(error => error);
+        if (!isFormValid) {
+            alert("Please fill all required fields.");
+            return;
+        }
+        if (!isConnected) {
+            alert("Please connect your wallet first.");
+            return;
+        }
+
+        setIsMinting(true);
+        setModalAddItem2(false);
+
+        try {
+            const imageUri = await uploadFileToIPFS(dataAddItemModal.itemImage as File);
+            const audioUri = await uploadFileToIPFS(dataAddItemModal.itemAudio as File);
+            if (!imageUri) throw new Error("Failed to upload image.");
+            if (!audioUri) throw new Error("Failed to upload image.");
+
+            const metadata = {
+                name: dataAddItemModal.itemName,
+                description: dataAddItemModal.itemProductDetails,
+                isListed: dataAddItemModal.itemIsListed,
+                image: imageUri,
+                audio: audioUri,
+                attributes: [
+                    { trait_type: "Birth", value: dataAddItemModal.itemBirth },
+                    { trait_type: "BirdType", value: dataAddItemModal.itemType },
+                    { trait_type: "KeeDuration", value: dataAddItemModal.itemKeeDuration },
+                    { trait_type: "BestAchievement", value: dataAddItemModal.itemBestAchievement },
+                ],
+            };
+            const metadataUri = await uploadJsonToIPFS(metadata);
+            if (!metadataUri) throw new Error("Failed to upload metadata.");
+
+            // Panggil kontrak addItem
+            await writeAddItemAsync({
+                address: COLLECTION_MANAGER_ADDRESS,
+                abi: COLLECTION_MANAGER_ABI,
+                functionName: 'addItem',
+                args: [BigInt(selectedCollectionId !== null && selectedCollectionId), metadataUri],
+                chainId: 4202,
+            });
+
+        } catch (err) {
+            console.error("Error minting Bird:", err);
+            alert(`An error occurred during minting: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+            setIsMinting(false);
+        }
+    };
+
+    const handleChangeAddItemModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        setDataAddItemModal({ ...dataAddItemModal, [prop]: event.target.value })
+    };
+
+    const handleEditDisplayClick = () => {
+        fileInputImageAddItemRef.current?.click();
+    };
+
+    const handleUploadAdioButtonClick = () => {
+        if (fileInputAudioAddItemRef.current) {
+            fileInputAudioAddItemRef.current?.click();
+        }
+    };
+
+    const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            console.log('File audio yang dipilih:', file);
+            // Di sini Anda bisa menambahkan logika untuk memproses file audio
+            // Misalnya, mengunggah ke server, atau memutar di browser
+
+            // Contoh: Tampilkan nama file dan ukurannya
+            // alert(`File dipilih: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+
+            // Contoh: Simpan file ke state untuk diputar nanti
+            setDataAddItemModal({ ...dataAddItemModal, itemAudio: file });
+        }
+    };
+
+    const handleAudiuPlayPause = () => {
+        if (audioIsPlaying) {
+            audioRef.current?.pause();
+        } else {
+            audioRef.current?.play();
+        }
+        setAudioIsPlaying(!audioIsPlaying);
+    };
+
+    const handleImageAddItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setDataAddItemModal({ ...dataAddItemModal, itemImage: file, itemImagePreview: URL.createObjectURL(file) });
+        }
+    };
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    const isProcessPending = isCollectionLoading || isUploadingItem || isPendingAdd || isConfirmingAdd || isMinting;
+    const displayAddress =
+        hasMounted && selectedCollectionDetails
+            ? `${selectedCollectionDetails.address.substring(0, 6)}...${selectedCollectionDetails.address.substring(selectedCollectionDetails.address.length - 4)}`
+            : "Wallet Not Connected";
+
+    const detailCardProps = selectedCollectionDetails ? {
+        label: selectedCollectionDetails.label,
+        address: selectedCollectionDetails.address,
+        category: selectedCollectionDetails.category,
+        labelButton: "ADD BIRD",
+        launchedDate: "June 2024",
+        onClick: () => setModalAddItem(true),
+        netWorth: 0,
+        itemsCount: selectedCollectionDetails.itemsCount,
+        listedCount: 0,
+        owner: displayAddress,
+    } : {
+        label: "Select a Collection",
+        address: displayAddress,
+        category: "N/A",
+        labelButton: "ADD BIRD",
+        launchedDate: "N/A",
+        onClick: () => alert("Please select a collection first."),
+        netWorth: 0,
+        itemsCount: 0,
+        listedCount: 0,
+        owner: "-",
+    };
+
+    return (
+        <div id="layout-wallet-inventory-container" className="mt-10 flex flex-col" suppressHydrationWarning>
+            {/* <SearchParamsHandler onCollectionIdChange={handleCollectionIdChange} /> */}
+
+            <DetailCard {...detailCardProps} />
+            <NavButton initialMenuItems={menuData} />
+            {children}
+
+            {/* --- MODAL ADD BIRD --- */}
+            <MiniModal
+                isOpen={modalAddItemIsOpen}
+                onClose={handleCloseAddItemModal}
+                title="ADD BIRD"
+                onConfirm={handleContinueModalAddItem}
+                confirmButtonText="CONTINUE"
+                disableConfirm={!isConnected || isProcessPending}
+            >
+                <div id="add-item-modal-wrapper" className=" space-y-3">
+                    <div id="edit-item-display" className="flex items-center space-x-4">
+                        <Image
+                            priority
+                            height={150}
+                            width={100}
+                            src={dataAddItemModal.itemImagePreview}
+                            alt="item-image"
+                        />
+                        <TextButton
+                            label="Edit Bird Display"
+                            onClick={handleEditDisplayClick}
+                            size="S"
+                        />
+                        <input
+                            type="file"
+                            ref={fileInputImageAddItemRef}
+                            onChange={handleImageAddItemChange}
+                            accept="image/png, image/jpeg, image/webp"
+                            className="hidden"
+                        />
+                    </div>
+                    <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">displayed Bird must match with the real one.</div>
+                    <LegendInputBox
+                        legendText="Bird Name"
+                        placeholder="Name"
+                        value={dataAddItemModal.itemName}
+                        onChangeInput={handleChangeAddItemModal('itemName')}
+                        required={dataAddItemModalisError.itemName}
+                        requiredMsg="You must input the name"
+                    />
+                    <LegendInputBox
+                        legendText="Birth Date (DD/MM/YYYY)"
+                        placeholder="Birth"
+                        value={dataAddItemModal.itemBirth || Date.now()}
+                        onChangeInput={handleChangeAddItemModal('itemBirth')}
+                        type="Date"
+                        required={dataAddItemModalisError.itemBirth}
+                        requiredMsg="You must input the birth"
+                    />
+                    <LegendInputBox
+                        legendText="Bird Type"
+                        placeholder="Red Hat Cikurai"
+                        value={dataAddItemModal.itemType}
+                        onChangeInput={handleChangeAddItemModal('itemType')}
+                        required={dataAddItemModalisError.itemType}
+                        requiredMsg="You must input the type"
+                    />
+                </div>
+            </MiniModal>
+            <MiniModal
+                isOpen={modalAddItem2IsOpen}
+                onClose={handleCloseAddItemModal}
+                title="ADD BIRD"
+                onConfirm={handleSaveAddItemModal}
+                onCancel={handleBackModalAddItem}
+                cancelButtonText="BACK"
+                confirmButtonText="ADD BIRD"
+                disableConfirm={isProcessPending}
+            >
+                <div id="add-item-modal-wrapper2" className=" space-y-3">
+                    <div className="w-36 justify-start"><span className="text-Color-White-2/70 text-xl font-semibold font-['D-DIN-PRO'] leading-7">About </span><span className="text-Color-White-1 text-xl font-semibold font-['D-DIN-PRO'] leading-7">Bird:</span></div>
+                    <div id="edit-audio-display" className="flex items-center space-x-4">
+                        {
+                            dataAddItemModal.itemAudioURL !== "" && (
+                                <audio
+                                    controls
+                                    ref={audioRef}
+                                    src={dataAddItemModal.itemAudioURL || undefined}
+                                    onPlay={() => setAudioIsPlaying(true)}
+                                    onPause={() => setAudioIsPlaying(false)}
+                                />
+                            )
+                        }
+                        {/* <button onClick={handleAudiuPlayPause}>Play</button> */}
+                        {/* <TextButton
+                            label="play"
+                            onClick={handleAudiuPlayPause}
+                            size="S"
+                        /> */}
+                        <TextButton
+                            label={dataAddItemModal.itemAudioURL !== "" ? "Edit Kee Bird" : "Add Kee Bird"}
+                            onClick={handleUploadAdioButtonClick}
+                            size="S"
+                        />
+                        <input
+                            type="file"
+                            ref={fileInputAudioAddItemRef}
+                            onChange={handleAudioFileChange}
+                            accept="audio/*" // Menerima semua jenis file audio
+                            className="hidden" // Gunakan CSS untuk menyembunyikan
+                            style={{ display: 'none' }} // Alternatif CSS inline
+                        />
+                    </div>
+                    {/* <LegendInputBox
+                        legendText="Size"
+                        placeholder="Shoes Size"
+                        type="text"
+                        value={dataAddItemModal.itemSize}
+                        onChangeInput={handleChangeAddItemModal('itemSize')}
+                        required={dataAddItemModalisError.itemSize}
+                        requiredMsg="You must input the size"
+                    /> */}
+                    <LegendInputBox
+                        legendText="Best Achievement"
+                        placeholder="National / Regional / etc"
+                        value={dataAddItemModal.itemBestAchievement}
+                        onChangeInput={handleChangeAddItemModal('itemBestAchievement')}
+                        required={dataAddItemModalisError.itemBestAchievement}
+                        requiredMsg="You must input the best achievement"
+                    />
+                    <LegendInputBox
+                        legendText="Longest Kee Duration (second)"
+                        placeholder="190"
+                        type="number"
+                        value={dataAddItemModal.itemKeeDuration}
+                        onChangeInput={handleChangeAddItemModal('itemKeeDuration')}
+                        required={dataAddItemModalisError.itemKeeDuration}
+                        requiredMsg="You must input the kee duration"
+                    />
+                    <LegendInputBox
+                        legendText="Product Details"
+                        placeholder="Details"
+                        value={dataAddItemModal.itemProductDetails}
+                        onChangeInput={handleChangeAddItemModal('itemProductDetails')}
+                        required={dataAddItemModalisError.itemProductDetails}
+                        requiredMsg="You must input the product details"
+                    />
+                    <div className="self-stretch justify-start text-Color-White-2/70 text-base font-medium font-['D-DIN-PRO'] leading-snug">Please enter all details that correspond to the physical product here (e.g., description, color, etc.).</div>
+                </div>
+            </MiniModal>
+        </div >
+    )
+};
