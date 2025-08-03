@@ -38,9 +38,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [createdCollectionId, setCreatedCollectionId] = useState<number | null>(null);
 
     const categoryOptions = [
-        { value: 'Shoes', label: 'Shoes' },
-        { value: 'Watch', label: 'Watch' },
-        { value: 'Card', label: 'Card' },
+        { value: 'Bird-Contest', label: 'Bird Contest' },
+        { value: 'Bird-Jalak ', label: 'Bird Jalak' },
+        { value: 'Bird-Keecau', label: 'Bird Keecau' },
     ];
 
     const menuData = [

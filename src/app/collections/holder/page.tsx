@@ -25,9 +25,8 @@ const HolderPage: React.FC = () => {
             itemsOwned: 6,
             estValue: '-',
             items: [
-                '/images/shoes.png',
-                '/images/shoes.png',
-                '/images/shoes.png',
+                '/images/bird2.png',
+                '/images/bird3.png',
             ],
             moreItems: 3,
         },
@@ -38,8 +37,8 @@ const HolderPage: React.FC = () => {
             itemsOwned: 12,
             estValue: '$12.00',
             items: [
-                '/images/shoes.png',
-                '/images/shoes.png',
+                '/images/bird.png',
+                '/images/bird3.png',
             ],
             moreItems: 0,
         },
