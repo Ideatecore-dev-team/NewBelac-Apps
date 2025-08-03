@@ -41,7 +41,7 @@ const Homepage = () => {
                         alt="Flying bird"
                         width={50}
                         height={50}
-                        className='size-[40px] lg:size-[50px] opacity-100 -rotate-y-180'
+                        className='size-[40px] lg:size-[50px] opacity-50 -rotate-y-180'
                     />
             </div>
 
