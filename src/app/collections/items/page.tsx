@@ -1,74 +1,58 @@
 "use client";
 import Image from "next/image";
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import { COLLECTION_MANAGER_ABI } from "@/constants/COLLECTION_MANAGER_ABI";
-import { COLLECTION_MANAGER_ADDRESS } from "@/constants";
+import { COLLECTION_MANAGER_ADDRESS, PRODUCT_NFT_ADDRESS } from "@/constants";
 import { LegendInputBox } from "@/app/ui/inputbox";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useSearchParams } from 'next/navigation';
+import { PRODUCT_NFT_ABI } from "@/constants/PRODUCT_NFT_ABI";
+import ItemCard, { FilterStatus, Item, ItemCardProps } from "@/app/ui/collections/item-card";
+import BigModal from "@/app/ui/modal/bigModal";
 
-type FilterStatus = 'All' | 'Listed' | 'Not Listed';
-
-interface Collection {
-    id: number;
-    label: string;
-    price: number;
-    items: number;
-    filterStatus: FilterStatus;
-    // image: string; //biar nggak bug
+interface IpfsResult {
+    result: string;
+    status: 'success' | 'failure';
 }
 
-interface CollectionCardProps {
-    data: Collection;
+// Tipe data untuk metadata yang diharapkan
+interface NftMetadata {
+    name: string;
+    description: string;
+    image: string;
+    attributes?: Array<{
+        trait_type: string;
+        value: string;
+    }>;
 }
 
-const CollectionCard: FC<CollectionCardProps> = ({ data }) => (
-    <div className="items-card w-[295px] bg-Color-Grey-2 rounded-md border border-[#2C2C2C] bg-Color-Gray-2 inline-flex flex-col justify-start items-start overflow-hidden">
-        <Image
-            priority
-            width={295}
-            height={192}
-            // sizes="(max-width: 295px)"
-            src="/images/shoes.png"
-            alt={data.label}
-            className="w-[295px] h-[192px] bg-Color-Grey-1 self-stretch"
-            onError={(e) => {
-                e.currentTarget.src = `https://placehold.co/295x192/151515/FFF?text=Error`;
-            }}
-        />
-        <div className="self-stretch px-4 py-4 inline-flex justify-start items-start gap-7">
-            <div className="flex-1 inline-flex flex-col justify-start items-center gap-4">
-                <div className="self-stretch inline-flex justify-between items-center gap-4 w-full">
-                    <h1 className="justify-start text-Color-White-1 text-base font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">{data.label}</h1>
-                    <div className="flex justify-start items-center gap-1.5">
-                        <div className="p-1.5 bg-Color-Grey-2 rounded outline outline-offset-[-1px] outline-[#2C2C2C] flex justify-center items-center gap-2.5">
-                            <h1 className="justify-start text-[#4dacff] text-sm font-semibold font-['D-DIN-PRO'] capitalize leading-none tracking-wide">#{data.id}</h1>
-                        </div>
-                    </div>
-                </div>
-                <div className="self-stretch h-9 inline-flex justify-start items-end gap-8">
-                    <div className="inline-flex flex-col justify-start items-start gap-2">
-                        <div className="inline-flex justify-start items-center gap-[5px]">
-                            <div className="justify-start text-Color-White-1 text-sm font-semibold font-['D-DIN-PRO'] uppercase leading-none tracking-wide">{data.filterStatus}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-);
-
+// Fungsi helper untuk mengonversi URI IPFS ke URL HTTP
+const resolveIpfsUrl = (ipfsUri: string): string => {
+    if (!ipfsUri) {
+        return "https://placehold.co/300x200.png"; // Placeholder default
+    }
+    const ipfsGatewayUrl = 'https://ipfs.io/ipfs/';
+    const cid = ipfsUri.replace('ipfs://', '');
+    return `${ipfsGatewayUrl}${cid}`;
+};
 
 export default function Items() {
     const [activeStatus, setActiveStatus] = useState<FilterStatus>('All');
+    const [metadataList, setMetadataList] = useState<NftMetadata[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [dataCollectionModal, setDataCollectionModal] = useState({
         ava: '/icons/edit-profile.svg',
         collecionName: "",
         collectionSymbol: "",
         collectionCategory: "",
     })
+    const searchParams = useSearchParams();
+    const collectionIdFromUrl = searchParams.get('collectionId');
+    const selectedCollectionId = collectionIdFromUrl ? Number(collectionIdFromUrl) : null;
 
 
-    const collectionsData: Collection[] = [
+    const collectionsData: Item[] = [
         { id: 1, label: 'Nike Realmark A', price: 10.1, items: 68, filterStatus: "Not Listed" },
         { id: 2, label: 'Nike Realmark B', price: 10.1, items: 68, filterStatus: "Listed" },
         { id: 3, label: 'Nike Realmark C', price: 10.1, items: 68, filterStatus: "Listed" },
@@ -82,8 +66,71 @@ export default function Items() {
     const activeButtonClasses = "bg-gradient-to-b from-zinc-900 to-gray-800 shadow-[0px_4px_5px_0px_rgba(71,175,255,0.25)] outline-[#4dacff]";
     const inactiveButtonClasses = "bg-[#1c1c1c] outline-[#2c2c2c]";
 
+    // --- Ambil dari useAuth ---
+    const {
+        address,
+        isConnected,
+        useReadContract,
+        useReadContracts
+    } = useAuth();
 
-    // 4. Terapkan logika filter SEBELUM melakukan .map()
+    const { data: collectionIds, isLoading: isLoadingCollectionIds, isError: isErrorCollectionIds, error: errorCollectionIds } = useReadContract({
+        address: COLLECTION_MANAGER_ADDRESS,
+        abi: COLLECTION_MANAGER_ABI,
+        functionName: 'getCollectionsByCreator',
+        args: [address as `0x${string}`],
+        query: {
+            enabled: isConnected && !!address,
+        },
+    });
+
+    // Ambil data koleksi
+    const { data: collectionData = [], isLoading: isCollectionLoading, isError: isCollectionError } = useReadContract({
+        address: COLLECTION_MANAGER_ADDRESS,
+        abi: COLLECTION_MANAGER_ABI,
+        functionName: 'getCollection',
+        args: [BigInt(selectedCollectionId !== null && selectedCollectionId)],
+        query: {
+            enabled: selectedCollectionId !== null && isConnected,
+        },
+    });
+
+    const collectionsReadTokenURI = (collectionData[4] || []).map((id: bigint) => ({
+        address: PRODUCT_NFT_ADDRESS,
+        abi: PRODUCT_NFT_ABI,
+        functionName: 'tokenURI',
+        args: [id],
+        query: {
+            enabled: collectionData !== null && isConnected,
+        },
+    }));
+
+
+    const { data: tokenUriRawData = [], isLoading: isLoadingCollections, isError: isErrorCollections, error: errorCollections } = useReadContracts({
+        contracts: collectionsReadTokenURI,
+        query: {
+            enabled: !isCollectionLoading && ((collectionData?.length ?? 0) > 0),
+        },
+    });
+
+    console.log('ini adalah tokenUriRawData', tokenUriRawData)
+
+    const fetchIpfsData = async (ipfsUri: string) => {
+        // Mengubah IPFS URI menjadi URL HTTP
+        const cid = ipfsUri.replace('ipfs://', '');
+        const IPFS_GATEWAY_URL = 'https://ipfs.io/ipfs/';
+        const url = `${IPFS_GATEWAY_URL}${cid}`;
+
+        // Mengambil data dari URL
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data from IPFS: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    };
+
+    // Terapkan logika filter SEBELUM melakukan .map()
     const filteredData = collectionsData.filter(collection => {
         if (activeStatus === 'All') {
             return true;
@@ -94,6 +141,49 @@ export default function Items() {
     const handleChangeDataCollectionModal = (prop: any) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setDataCollectionModal({ ...dataCollectionModal, [prop]: event.target.value })
     }
+
+    useEffect(() => {
+
+        if (tokenUriRawData && tokenUriRawData.length > 0) {
+            const handleFetchAllMetadata = async () => {
+                try {
+                    setIsLoading(true);
+                    setError(null);
+
+                    // Buat array dari semua promise yang akan mengambil data dari IPFS
+                    const fetchPromises = tokenUriRawData.map(item => {
+                        if (item.status === 'success') {
+                            return fetchIpfsData(item.result);
+                        }
+                        return null; // Abaikan item yang gagal
+                    });
+
+                    // Tunggu semua promise selesai secara paralel
+                    const allMetadata = await Promise.all(fetchPromises.filter(Boolean));
+                    setMetadataList(allMetadata);
+
+                } catch (err) {
+                    console.error("Error fetching IPFS data:", err);
+                    setError("Failed to load collection metadata.");
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            handleFetchAllMetadata();
+        }
+    }, [tokenUriRawData]);
+
+    if (isLoading) {
+        return <div>Loading collections...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    console.log('ini adalah metadataList', metadataList)
+
 
     return (
         <div id="collection-page-container" className="flex flex-col justify-center items-center grow self-stretch text-white">
@@ -142,12 +232,39 @@ export default function Items() {
                 </div>
 
                 {/* Daftar Item */}
-                <div className="content-grid flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {filteredData.map((collection) => (
-                        <CollectionCard key={collection.id} data={collection} />
-                    ))}
-                </div>
+                {
+                    tokenUriRawData.length > 0 && (
+                        <div className="content-grid flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {
+                                // tokenUriRawData.map((item, key) => {
+                                //     const data:ItemCardProps = {
+                                //         id: key
+                                //     }
+                                //     return (
+                                //         <ItemCard key={key} data={data} />
+                                //     )
+                                // })
+                            }
+                        </div>
+                    )
+                }
             </div>
+
+            <BigModal
+                isOpen={false}
+                onClose={() => alert('hai')}
+                collectionImage="string"
+                collectionName="string"
+                collectionSymbol="string"
+                collectionCategory="string"
+                itemImage="string"
+                itemName="string"
+                itemOwner="string"
+                itemPrice={0}
+                itemUniqueTag="string"
+                itemSize="string"
+                itemProductDetails="string"
+            />
         </div>
     )
 }
